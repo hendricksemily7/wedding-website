@@ -39,21 +39,21 @@ export default function Home() {
         <main className="flex flex-col gap-[32px] row-start-1 items-center sm:items-start"> {/* Adjusted row-start */}
           <div className="flex flex-row gap-4">
             <Image
-              src="/bwkiss.JPG"
+              src="/bwkiss.jpg"
               alt="Wedding photo"
               width={500}
               height={200}
               priority
             />
             <Image
-              src="/bwalk.JPG"
+              src="/bwalk.jpg"
               alt="Wedding photo"
               width={500}
               height={200}
               priority
             />
             <Image
-              src="/bwholding.JPG"
+              src="/bwholding.jpg"
               alt="Wedding photo"
               width={500}
               height={200}
