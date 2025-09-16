@@ -1,18 +1,9 @@
 // src/app/page.tsx
 import Image from "next/image";
-import Header from './header'; // Adjust the import path if your Header.tsx is not in the same directory
+import HomeHeader from './homeHeader'; // Adjust the import path if your Header.tsx is not in the same directory
+import { weddingNavLinks } from "./utils";
 
 export default function Home() {
-  const weddingNavLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'Our Story', href: '/our-story' },
-    { label: 'Travel', href: '/travel' },
-    { label: 'Things to Do', href: '/things-to-do' },
-    { label: 'Photos', href: '/photos' },
-    { label: 'Wedding Party', href: '/wedding-party' },
-    { label: 'Registry', href: '/registry' },
-    { label: 'RSVP', href: '/rsvp' },
-  ];
 
   const calculateDaysToGo = () => {
     const weddingDate = new Date('2026-09-26T00:00:00'); // September 26, 2026
@@ -25,7 +16,7 @@ export default function Home() {
   return (
     <div className="font-sans min-h-screen"> {/* Removed grid, padding, and centering from this div */}
       {/* Header component incorporated here - now outside the main content grid for full width */}
-      <Header
+      <HomeHeader
         logoSrc="/bwwalk2.jpg"
         // logoSrc="/mansfield2.png"
         coupleNames="EMILY & JESS"
