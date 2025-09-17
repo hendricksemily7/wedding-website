@@ -1,0 +1,67 @@
+/* Header.css */
+
+.header-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  background-color: #d5dad47f;
+}
+
+.logo-section {
+  text-align: center;
+}
+
+.logo-image {
+  max-width: 500px; /* Adjust this value to your desired maximum width */
+  height: auto;     /* This keeps the image's aspect ratio correct */
+}
+
+.couple-names {
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+.event-details,
+.countdown {
+  font-size: 0.9em;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.our-story-body{
+  text-align: center;
+}
+
+.navbar {
+  margin-top: 20px; /* Space between text and nav bar */
+  border-top: 1px; /* Optional separator */
+  padding-top: 15px;
+  font-family: Garamond, serif;
+  font-size: 18px;
+}
+
+.nav-list {
+  list-style: none; /* Remove bullet points */
+  padding: 0;
+  margin: 0;
+  display: flex; /* Makes list items horizontal */
+  justify-content: center; /* Centers the navigation items */
+  gap: 20px; /* Space between navigation items */
+}
+
+.nav-item {
+  /* No specific styling needed here if gap is used on the ul */
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  padding: 5px 10px;
+  transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #4d6b36ae; /* Example hover effect */
+}

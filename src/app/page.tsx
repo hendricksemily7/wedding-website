@@ -17,7 +17,7 @@ export default function Home() {
     <div className="font-sans min-h-screen"> {/* Removed grid, padding, and centering from this div */}
       {/* Header component incorporated here - now outside the main content grid for full width */}
       <HomeHeader
-        logoSrc="/bwwalk2.jpg"
+        logoSrc="/bwface.jpg"
         // logoSrc="/mansfield2.png"
         coupleNames="EMILY & JESS"
         eventDetails="SEPTEMBER 26, 2026 • FAIRFAX, VT"

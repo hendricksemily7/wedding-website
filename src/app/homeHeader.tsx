@@ -1,6 +1,6 @@
 // homeHeader.tsx
 import React from 'react';
-import './header.css'; // Optional: for custom CSS if not using a framework like Tailwind
+import './homeHeader.css'; // Optional: for custom CSS if not using a framework like Tailwind
 
 interface HeaderProps {
   logoSrc: string;
