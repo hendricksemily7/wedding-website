@@ -1,8 +1,3 @@
-/* homeHeader.css */
-
-.home{
-  background-color: #d5dad47f;  
-}
 
 .header-container {
   display: flex;
@@ -33,10 +28,6 @@
   font-size: 0.9em;
   color: #555;
   margin-bottom: 5px;
-}
-
-.our-story-body{
-  text-align: center;
 }
 
 .navbar {

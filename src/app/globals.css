@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #d5dad47f;
+  /* --background: #d5dad47f; */
   --foreground: #171717;
 }
 
@@ -14,7 +14,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #d5dad47f;
+    /* --background: #d5dad47f; */
     /* --foreground: #023b06; */
   }
 }
@@ -26,3 +26,4 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+

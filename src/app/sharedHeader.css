@@ -29,10 +29,6 @@
   margin-bottom: 5px;
 }
 
-.our-story-body{
-  text-align: center;
-}
-
 .navbar {
   margin-top: 20px; /* Space between text and nav bar */
   border-top: 1px; /* Optional separator */
@@ -64,4 +60,9 @@
 
 .nav-link:hover {
   color: #4d6b36ae; /* Example hover effect */
+}
+
+.nav-link-active {
+  color: #4d6b36ae; /* Highlight color */
+  /* text-decoration: underline; */
 }
