@@ -1,4 +1,8 @@
-export const weddingNavLinks = [
+interface DynamicDictionary {
+    [key: string]: string;
+}
+
+export const weddingNavLinksList = [
     { label: 'Home', href: '/' },
     { label: 'Our Story', href: '/our-story' },
     { label: 'Things to Do', href: '/things-to-do' },
@@ -7,6 +11,12 @@ export const weddingNavLinks = [
     { label: 'Accommodations', href: '/accommodations' },
     { label: 'RSVP', href: '/rsvp' },
   ];
+
+export const navLinksDict: DynamicDictionary = {};
+weddingNavLinksList.forEach(link => {
+  const key = link.href
+  navLinksDict[key] = link.label
+});
 
 export const calculateDaysToGo = () => {
     const weddingDate = new Date('2026-09-26T00:00:00'); // September 26, 2026

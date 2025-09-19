@@ -1,20 +1,19 @@
 import SharedHeader from '../sharedHeader';
-import { calculateDaysToGo, weddingNavLinks } from '../utils';
+import { calculateDaysToGo, weddingNavLinksList } from '../utils';
 import './accommodations.css'
 import Image from 'next/image';
 
 // I want to make it so thase go down in a row - are clickable and more
 export default function Page() {
   return (
-    <div className="font-sans min-h-screen"> {/* Removed grid, padding, and centering from this div */}
+    <div className="font-sans min-h-screen bg-[#d5dad47f]"> 
       <SharedHeader
-        logoSrc="/bwface.jpg"
         coupleNames="EMILY & JESS"
         eventDetails="SEPTEMBER 26, 2026 • FAIRFAX, VT"
         countdown={calculateDaysToGo()}
-        navLinks={weddingNavLinks}
+        navLinksList={weddingNavLinksList}
       />
-      <div className="grid grid-rows-[1fr_auto] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 bg-[#d5dad47f]">
+      <div className="grid grid-rows-[1fr_auto] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
         {/* 
           The main container now holds two separate flex items, one for each hotel.
           To maintain vertical layout for these rows, use flex-col on the main element.
@@ -25,7 +24,7 @@ export default function Page() {
             <h1>Holiday Inn, Saint Albans</h1>
             <Image 
                 alt="Holiday Inn, Saint Albans" 
-                src="/holiday.jpg"
+                src="/holiday3.jpg"
                 className="hotel-image"
                 width={700} 
                 height={700} 
@@ -44,7 +43,7 @@ export default function Page() {
             />
           </div>
         </main>
-        <footer className="row-start-2 flex gap-[24px] flex-wrap items-center justify-center"> {/* Adjusted row-start */}
+        <footer className="row-start-2 flex gap-[24px] flex-wrap items-center justify-center">
           <a
             className="flex items-center gap-2 hover:underline hover:underline-offset-4"
             href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"

@@ -1,24 +1,20 @@
 // src/app/page.tsx
 import Image from "next/image";
 import SharedHeader from './sharedHeader'; // Adjust the import path if your Header.tsx is not in the same directory
-import { calculateDaysToGo, weddingNavLinks } from "./utils";
+import { calculateDaysToGo, weddingNavLinksList } from "./utils";
 
 export default function Home() {
   return (
-    <div className="font-sans min-h-screen"> {/* Removed grid, padding, and centering from this div */}
-      {/* Header component incorporated here - now outside the main content grid for full width */}
+    <div className="font-sans min-h-screen bg-[#d5dad47f]"> { /* min height is screen height */}
       <SharedHeader
-        logoSrc="/bwface.jpg"
-        // logoSrc="/mansfield2.png"
         coupleNames="EMILY & JESS"
         eventDetails="SEPTEMBER 26, 2026 • FAIRFAX, VT"
         countdown={calculateDaysToGo()}
-        navLinks={weddingNavLinks}
+        navLinksList={weddingNavLinksList}
       />
 
-      {/* Main content wrapper - retains the grid and padding for its internal elements */}
-      <div className="grid grid-rows-[1fr_auto] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 bg-[#d5dad47f]"> {/* Adjusted grid-rows for main content */}
-        <main className="flex flex-col gap-[32px] row-start-1 items-center sm:items-start"> {/* Adjusted row-start */}
+      <div className="grid grid-rows-[1fr_auto] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20"> {/* Adjusted grid-rows for main content */}
+        <main className="flex flex-col gap-[32px] row-start-1 items-center sm:items-start">
           <div className="flex flex-row gap-4">
             <Image
               src="/bwkiss.jpg"

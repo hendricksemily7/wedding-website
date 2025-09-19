@@ -1,52 +1,70 @@
-// sharedHeader.tsx
-'use client'; // This directive is required for usePathname
-import React from 'react';
-import { usePathname } from 'next/navigation'; // Import the hook
-import Link from 'next/link'; // Use the Next.js Link component
-import './sharedHeader.css'; // Optional: for custom CSS if not using a framework like Tailwind
+'use client';
+import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { navLinksDict } from './utils';
 
-// TODO: make shared if we're keeping them consistent
 interface HeaderProps {
-  logoSrc: string;
   coupleNames: string;
   eventDetails: string;
   countdown: string;
-  navLinks: { label: string; href: string; }[];
+  navLinksList: { label: string; href: string }[];
 }
 
-const SharedHeader: React.FC<HeaderProps> = ({  logoSrc, coupleNames, eventDetails, countdown, navLinks }) => {
-  const pathname = usePathname(); // Get the current path
+const SharedHeader: React.FC<HeaderProps> = ({ coupleNames, eventDetails, countdown, navLinksList }) => {
+  const pathname = usePathname() as string;
+  const [isOpen, setIsOpen] = useState(false); // mobile menu toggle
+  const menuLabel = navLinksDict[pathname];
 
-  return (    
-    <header className="header-container">
-      <div className="logo-section">
-        <h1 className="couple-names">{coupleNames}</h1>
-        <p className="event-details">{eventDetails}</p>
-        <p className="countdown">{countdown}</p>
+  return (
+    <header className="">
+      {/* Top info section */}
+      <div className="flex flex-col items-center py-8">
+        <h1 className="text-4xl text-center">{coupleNames}</h1>
+        <p className="text-base text-stone-500 text-center">{eventDetails}</p>
+        <p className="text-base text-stone-500 text-center">{countdown}</p>
       </div>
-      <nav className="navbar">
-        <ul className="nav-list">
-          {/* {navLinks.map((link) => (
-            // check if the current path matches the link's href
-            <li key={link.label} className="nav-item">
-              <a href={link.href} className="nav-link">{link.label}</a>
-            </li>
-          ))} */}
-         {navLinks.map((link) => {
-          // check if the current path matches the link's href
-          const isActive = pathname === link.href;
-          return (
-            <li key={link.label} className="nav-item">
-              <Link
-                href={link.href}
-                // conditionally apply the active class
-                className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          )
-        })}
+
+      {/* Navigation */}
+      <nav className="">
+        {/* Mobile toggle button */}
+        <div className="flex justify-between items-center px-6 pb-4 md:hidden">
+          <span className="font-semibold text-md">{!isOpen ? menuLabel.toUpperCase(): ""}</span>
+          <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
+            {/* Simple hamburger */}
+            <div className="space-y-1">
+              <span className="block w-6 h-0.5 bg-gray-800"></span>
+              <span className="block w-6 h-0.5 bg-gray-800"></span>
+              <span className="block w-6 h-0.5 bg-gray-800"></span>
+            </div>
+          </button>
+        </div>
+
+        {/* Links */}
+        <ul
+          className={`
+            flex flex-wrap justify-center gap-4 px-6 py-4
+            md:flex-row md:items-center md:justify-center md:py-6
+            ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
+          `}
+        >
+          {navLinksList.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <li key={link.label}>
+                <Link
+                  href={link.href}
+                  className={`
+                    font-semibold px-3 py-2 rounded transition-colors
+                    ${isActive ? 'text-green-700' : 'text-gray-800'}
+                    hover:text-green-600
+                  `}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </header>
