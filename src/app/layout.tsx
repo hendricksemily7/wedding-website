@@ -68,7 +68,7 @@ export default function RootLayout({
               - mx-auto: centers this wrapper horizontally when max width kicks in
               - flex flex-col gap-[32px]: vertical stacking with 32px spacing between children
             */}
-            <div className="w-full max-w-[1700px] mx-auto flex flex-col gap-[32px]">
+            <div className="w-full max-w-[1600px] mx-auto flex flex-col gap-[32px]">
               {children}
             </div>
           </main>
