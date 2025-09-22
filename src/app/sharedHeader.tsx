@@ -19,16 +19,16 @@ const SharedHeader: React.FC<HeaderProps> = ({ coupleNames, eventDetails, countd
   return (
     <header className="">
       {/* Top info section */}
-      <div className="flex flex-col items-center py-8">
-        <h1 className="text-4xl text-center">{coupleNames}</h1>
-        <p className="text-base text-stone-500 text-center">{eventDetails}</p>
-        <p className="text-base text-stone-500 text-center">{countdown}</p>
+      <div className="flex flex-col items-center py-10">
+        <h1 className="text-2xl md:text-4xl text-center">{coupleNames}</h1>
+        <p className="text-sm md:text-base text-stone-500 text-center">{eventDetails}</p>
+        <p className="text-sm md:text-base text-stone-500 text-center">{countdown}</p>
       </div>
 
       {/* Navigation */}
       <nav className="">
         {/* Mobile toggle button */}
-        <div className="flex justify-between items-center px-6 pb-4 md:hidden">
+        <div className="flex justify-between items-center px-6 md:hidden">
           <span className="font-semibold text-md">{!isOpen ? menuLabel.toUpperCase(): ""}</span>
           <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
             {/* Simple hamburger */}
@@ -43,8 +43,8 @@ const SharedHeader: React.FC<HeaderProps> = ({ coupleNames, eventDetails, countd
         {/* Links */}
         <ul
           className={`
-            flex flex-wrap justify-center gap-4 px-6 py-4
-            md:flex-row md:items-center md:justify-center md:py-6
+            flex flex-wrap justify-center gap-4 px-6
+            md:flex-row md:items-center md:justify-center
             ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
           `}
         >
