@@ -14,7 +14,7 @@ interface HeaderProps {
 const SharedHeader: React.FC<HeaderProps> = ({ coupleNames, eventDetails, countdown, navLinksList }) => {
   const pathname = usePathname() as string;
   const [isOpen, setIsOpen] = useState(false); // mobile menu toggle
-  const menuLabel = navLinksDict[pathname];
+  const menuLabel = navLinksDict[pathname] || "";
 
   return (
     <header className="">
