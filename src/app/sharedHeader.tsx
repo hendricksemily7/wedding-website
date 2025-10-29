@@ -19,7 +19,7 @@ const SharedHeader: React.FC<HeaderProps> = ({ coupleNames, eventDetails, countd
   return (
     <header className="">
       {/* Top info section */}
-      <div className="flex flex-col items-center py-10">
+      <div className="flex flex-col items-center pb-10">
         <h1 className="text-2xl md:text-4xl text-center">{coupleNames}</h1>
         <p className="text-sm md:text-base text-stone-500 text-center">{eventDetails}</p>
         <p className="text-sm md:text-base text-stone-500 text-center">{countdown}</p>

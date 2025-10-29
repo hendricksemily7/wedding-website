@@ -25,7 +25,9 @@ export default function RootLayout({
         - bg-[#d5dad47f]: soft custom background color
       */}
       <body className="font-sans min-h-screen min-w-screen bg-[#d5dad47f]">
-        
+      <div className="md:pt-10 bg-[#d5dad47f]">
+        < Image src="/drawing-removebg-preview.png" alt="Wedding photo" width={500} height={300} className="md:max-w-[600px] w-full md:rounded-lg h-auto mx-auto" />
+      </div>
         {/*
           Header wrapper:
           - bg-[#d5dad47f]: gives the header a consistent light gray background

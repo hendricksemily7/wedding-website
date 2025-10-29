@@ -29,6 +29,7 @@ export default function Page() {
         {/* Text content wrapper */}
         {/* On medium screens, this takes 50% width. On mobile, it's full width */}
         <div className="md:w-1/2 text-center md:text-left space-y-4">
+          <div className="">Hello!</div>
           <p>
             We met in the Summer of 2023 in the beautiful state of Vermont. Emily was in Rutland, and Jess was in Burlington.
           </p>
