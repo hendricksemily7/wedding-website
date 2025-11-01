@@ -1,5 +1,10 @@
 // src/app/page.tsx
 import Image from "next/image";
+import { Geist } from 'next/font/google'
+
+const geist = Geist({
+  subsets: ['latin'],
+})
 
 export default function Page() {
   return (
@@ -26,10 +31,11 @@ export default function Page() {
           />
         </div>
         
-        {/* Text content wrapper */}
+        {/* Text content wrapper 
+        TODO: use Borel google font for "Our story" text bigger*/}
         {/* On medium screens, this takes 50% width. On mobile, it's full width */}
         <div className="md:w-1/2 text-center md:text-left space-y-4">
-          <div className="">Hello!</div>
+          <div className={geist.className}>Hello!</div>
           <p>
             We met in the Summer of 2023 in the beautiful state of Vermont. Emily was in Rutland, and Jess was in Burlington.
           </p>

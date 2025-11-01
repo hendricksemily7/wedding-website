@@ -3,14 +3,13 @@ interface DynamicDictionary {
 }
 
 export const weddingNavLinksList = [
-    { label: 'Home', href: '/' },
-    { label: 'Our Story', href: '/our-story' },
-    { label: 'Travel', href: '/travel' },
-    { label: 'Venue', href: '/venue' },
-    // { label: 'Wedding Party', href: '/wedding-party' },
-    { label: 'Registry', href: '/registry' },
-    { label: 'RSVP', href: '/rsvp' },
-    { label: 'Things to Do', href: '/things-to-do' },
+    { label: 'Home', href: '/', target: '' },
+    { label: 'Our Story', href: '/our-story', target: '' },
+    { label: 'Accommodations', href: '/accommodations', target: '' },
+    { label: 'Venue', href: '/venue', target: '' },
+    { label: 'Registry', href: 'https://registry.theknot.com/-december-2026-vt/75002398', target: 'blank' },
+    { label: 'RSVP', href: '/rsvp', target: '' },
+    { label: 'Q&A', href: '/q&a', target: '' },
   ];
 
 export const navLinksDict: DynamicDictionary = {};

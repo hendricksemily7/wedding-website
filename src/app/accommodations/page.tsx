@@ -23,12 +23,12 @@ const hotels = [
   },
   {
     id: 3,
-    name: 'Hampton Inn, Colchester',
-    imageSrc: '/HamptonColchester.jpeg',
-    link: 'https://www.hilton.com/en/hotels/btvmvhx-hampton-colchester/',
-    address: '1205 Airport Road, Saint Albans, VT 05478',
-    price: '$$$',
-    description: 'A third option located slightly further away, but still within a 25-minute drive. This hotel offers a different experience with its Colchester location. It includes free breakfast, free parking, a fitness center and a pool.',
+    name: 'Inn at Buckhollow Farm, Fairfax',
+    imageSrc: '/buckHollowInn.webp',
+    link: 'https://www.innatbuckhollow.com/',
+    address: '2150 Buck Hollow Rd, Fairfax, VT 05454',
+    price: '$211/night',
+    description: 'Located in close proximity of the venue, this adorable bed & breakfast offers 4 bedrooms (3 queens, 1 king). Includes full Vermont country breakfast.',
   },
 ];
 
