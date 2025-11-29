@@ -29,8 +29,8 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#E9F0EC] flex flex-col items-center justify-center px-6 py-20 text-center">
-      <div className="bg-white shadow-md rounded-lg p-10 max-w-3xl w-full">
+  <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
+    <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
         <h1
           className={`${playfair.className} text-4xl md:text-5xl font-medium text-[#2D4D3A] mb-10`}
         >
@@ -52,9 +52,9 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
           </button>
         </div>
 
-        <div className="text-sm text-[#3b3b3b] space-y-1">
+        <div className="text-sm text-[#2D4D3A] space-y-1 text-center">
           <p>Hosted by Emily and Jess Hendricks</p>
-          <p>Saturday, September 26 — 4:00 PM EDT</p>
+          <p>Saturday, September 26 — 4:30 PM EDT</p>
           <p>The Inn at Grace Farm, Fairfax, VT</p>
         </div>
       </div>

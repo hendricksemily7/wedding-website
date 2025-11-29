@@ -26,7 +26,16 @@ export default function RootLayout({
       */}
       <body className="font-sans min-h-screen min-w-screen bg-[#d5dad47f]">
       <div className="md:pt-10 bg-[#d5dad47f]">
-        < Image src="/drawing-removebg-preview.png" alt="Wedding photo" width={500} height={300} className="md:max-w-[600px] w-full md:rounded-lg h-auto mx-auto" />
+        {/* < Image src="/drawing-removebg-preview.png" alt="Wedding photo" width={500} height={300} className="md:max-w-[600px] w-full md:rounded-lg h-auto mx-auto" /> */}
+      {/* < Image src="/Shadow-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
+      {/* < Image src="/TRY-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
+       < Image src="/Notes_251129_133244-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" />
+       {/* < Image src="/Untitled_design-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
+
+
+      
+
+      
       </div>
         {/*
           Header wrapper:
