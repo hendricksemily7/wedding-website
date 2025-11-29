@@ -18,7 +18,7 @@ const hotels = [
     imageSrc: '/hampton.jpg',
     link: 'https://www.hilton.com/en/hotels/btvsahx-hampton-st-albans/',
     address: '4616 Airport Road, Saint Albans, VT 05478',
-    price: '$$$',
+    price: '$289/night',
     description: 'A great option with modern amenities, also a short drive from the festivities. Pet friendly but includes a pet fee. Has EV charging next door.',
   },
   {
