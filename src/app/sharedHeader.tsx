@@ -80,9 +80,11 @@ const SharedHeader: React.FC<HeaderProps> = ({
                   target={link.target}
                   className={`
                     font-semibold px-3 py-2 rounded transition-colors
-                    ${isActive ? 'text-green-700' : 'text-gray-800'}
-                    hover:text-green-600
+                    ${isActive ? 'text-[#5F8575]' : 'text-gray-800'}
+                    hover:text-[#5F8575]
                   `}
+                  onClick={() => setIsOpen(false)}
+
                 >
                   {link.label}
                 </Link>

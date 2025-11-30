@@ -12,8 +12,8 @@ const meals = [
   },
   {
     id: "pasta",
-    name: "Pasta Primavera",
-    description: "Fresh vegetables, olive oil, and herbs",
+    name: "Spinach Ravioli",
+    description: "With a basil cream sauce",
   },
   {
     id: "squash",
@@ -62,7 +62,7 @@ export default function MealSelectionPage() {
                 value={meal.id}
                 checked={selectedMeal === meal.id}
                 onChange={() => setSelectedMeal(meal.id)}
-                className="mr-2"
+                className="mr-2 accent-[#2D4D3A]"
               />
               <span className="font-medium text-[#2D4D3A]">{meal.name}</span>
               <p className="text-sm text-gray-500 ml-6">{meal.description}</p>

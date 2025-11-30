@@ -10,9 +10,9 @@ const playfair = Playfair_Display({
 
 export default function Page() {
   return (
-    <div className="w-full max-w-5xl mx-auto px-6 py-10 text-center">
+    <div className="w-full max-w-5xl mx-auto px-6 text-center">
       {/* Title */}
-      <h1 className={`${playfair.className} text-3xl md:text-4xl font-bold mb-6`}>The Inn at Grace Farm</h1>
+      <h1 className={`${playfair.className} text-2xl md:text-2xl font-bold mb-6`}>The Inn at Grace Farm</h1>
 
       {/* Image */}
       <div className="relative w-full h-80 md:h-[500px] mb-6">
