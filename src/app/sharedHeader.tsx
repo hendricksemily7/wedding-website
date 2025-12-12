@@ -47,9 +47,9 @@ const SharedHeader: React.FC<HeaderProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="">
+      <nav className="bg-[#E9F0EC]">
         {/* Mobile toggle button */}
-        <div className="flex justify-between items-center px-6 md:hidden">
+        <div className="flex justify-between items-center px-6 pt-10 md:hidden">
           <span className="font-semibold text-md">
             {!isOpen ? menuLabel.toUpperCase() : ''}
           </span>
@@ -66,7 +66,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
         {/* Links */}
         <ul
           className={`
-            flex flex-wrap justify-center gap-4 px-6
+            flex flex-wrap justify-center gap-4 px-6 pt-10
             md:flex-row md:items-center md:justify-center
             ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
           `}

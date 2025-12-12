@@ -29,7 +29,8 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
   };
 
   return (
-  <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
+  // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
+    <div className="flex items-center justify-center w-full px-6 py-12">
     <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
         <h1
           className={`${playfair.className} text-4xl md:text-5xl font-medium text-[#2D4D3A] mb-10`}

@@ -34,12 +34,13 @@ export default function MealSelectionPage() {
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
  
   const handleNext = () => {
-    if (!selectedMeal) return alert("Please select a meal!");
     router.push(`/rsvp/${guestName}/comments?meal=${selectedMeal}`);
   };
 
   return (
-      <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
+      // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
+      <div className="flex items-center justify-center w-full px-6 py-12">
+
         <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
         <h1 className={`${playfair.className} text-2xl font-semibold mb-4`}>Select your meal</h1>
         <p className="mb-4 text-gray-600">
@@ -72,11 +73,11 @@ export default function MealSelectionPage() {
         <button
           onClick={handleNext}
           disabled={!selectedMeal}
-          className={`mt-6 w-full border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition
+          className={`mt-6 border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition
             ${selectedMeal
               ? "bg-transparent hover:bg-[#E9F0EC] cursor-pointer"
               : "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"}
-          `}
+          mx-auto`}
         >
           Continue
         </button>
