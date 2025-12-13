@@ -29,31 +29,28 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
   };
 
   return (
-  // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
-    <div className="flex items-center justify-center w-full px-6 py-12">
-    <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
+    <div className="flex items-center justify-center w-full px-2 py-8 overflow-x-hidden">
+      <div className="bg-white shadow-md rounded-lg w-full max-w-2xl flex flex-col items-center box-border p-6 md:p-10">
         <h1
-          className={`${playfair.className} text-4xl md:text-5xl font-medium text-[#2D4D3A] mb-10`}
+          className={`${playfair.className} text-3xl md:text-5xl font-medium text-[#2D4D3A] mb-10`}
         >
           {displayName}
         </h1>
-
-        <div className="flex justify-center gap-8 mb-8">
+        <div className="text-lg flex justify-center gap-4 md:gap-8 mb-8 flex-wrap">
           <button
             onClick={handleWillAttend}
-            className="bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
+            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
           >
             Will Attend
           </button>
           <button
             onClick={handleWillNotAttend}
-            className="bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
+            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
           >
             Will Not Attend
           </button>
         </div>
-
-        <div className="text-sm text-[#2D4D3A] space-y-1 text-center">
+        <div className="text-lg text-[#2D4D3A] space-y-3 text-center">
           <p>Hosted by Emily and Jess Hendricks</p>
           <p>Saturday, September 26 — 4:30 PM EDT</p>
           <p>The Inn at Grace Farm, Fairfax, VT</p>

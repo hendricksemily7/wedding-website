@@ -30,17 +30,17 @@ const SharedHeader: React.FC<HeaderProps> = ({
   return (
     <header className="">
       {/* Top info section */}
-      <div className="flex flex-col items-center pb-10">
+      <div className="flex flex-col items-center pb-5">
         <h1 className={`${playfair.className} text-2xl md:text-4xl text-center`}>
           {coupleNames}
         </h1>
         <p
-          className={`${playfair.className} text-sm md:text-base text-stone-500 text-center`}
+          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
         >
           {eventDetails}
         </p>
         <p
-          className={`${playfair.className} text-sm md:text-base text-stone-500 text-center`}
+          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
         >
           {countdown}
         </p>
@@ -49,7 +49,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
       {/* Navigation */}
       <nav className="bg-[#E9F0EC]">
         {/* Mobile toggle button */}
-        <div className="flex justify-between items-center px-6 pt-10 md:hidden">
+        <div className="flex justify-between items-center px-6 pt-10 md:hidden text-xl">
           <span className="font-semibold text-md">
             {!isOpen ? menuLabel.toUpperCase() : ''}
           </span>
@@ -66,7 +66,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
         {/* Links */}
         <ul
           className={`
-            flex flex-wrap justify-center gap-4 px-6 pt-10
+            flex flex-wrap justify-center gap-4 px-6 pt-10 text-xl
             md:flex-row md:items-center md:justify-center
             ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
           `}

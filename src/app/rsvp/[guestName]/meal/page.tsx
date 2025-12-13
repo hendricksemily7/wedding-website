@@ -39,15 +39,15 @@ export default function MealSelectionPage() {
 
   return (
       // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
-      <div className="flex items-center justify-center w-full px-6 py-12">
+      <div className="flex items-center justify-center w-full">
 
-        <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
-        <h1 className={`${playfair.className} text-2xl font-semibold mb-4`}>Select your meal</h1>
-        <p className="mb-4 text-gray-600">
+        <div className="bg-white shadow-md rounded-lg p-5 w-full max-w-2xl flex flex-col">
+        <h1 className={`${playfair.className} text-left text-3xl font-semibold mb-4`}>Select your meal</h1>
+        <p className="text-xl mb-4 text-gray-600">
           All meals come with broiled asparagus, dinner rolls with butter, and salad.
         </p>
 
-        <div className="space-y-3">
+        <div className="text-lg space-y-3">
           {meals.map(meal => (
             <label
               key={meal.id}
@@ -66,7 +66,7 @@ export default function MealSelectionPage() {
                 className="mr-2 accent-[#2D4D3A]"
               />
               <span className="font-medium text-[#2D4D3A]">{meal.name}</span>
-              <p className="text-sm text-gray-500 ml-6">{meal.description}</p>
+              <p className="text-lg text-gray-500 space-y-2">{meal.description}</p>
             </label>
           ))}
         </div>

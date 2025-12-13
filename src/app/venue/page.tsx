@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <div className="w-full max-w-5xl mx-auto px-6 text-center">
       {/* Title */}
-      <h1 className={`${playfair.className} text-2xl md:text-2xl font-bold mb-6`}>The Inn at Grace Farm</h1>
+      <h1 className={`${playfair.className} text-2xl md:text-3xl font-bold mb-6`}>The Inn at Grace Farm</h1>
 
       {/* Image */}
       <div className="relative w-full h-80 md:h-[500px] mb-6">
@@ -26,10 +26,10 @@ export default function Page() {
       </div>
 
       {/* Text lines */}
-      <p className="text-lg text-gray-700 mb-2">
+      <p className="text-xl text-gray-700 mb-2">
         Nestled in the heart of Vermont, our venue blends rustic charm with modern elegance.
       </p>
-      <p className="text-lg text-gray-700">
+      <p className="text-xl text-gray-700">
         We can’t wait to celebrate this special day with you surrounded by nature and love.
       </p>
       <div className="flex justify-center items-center gap-2 mt-6 text-gray-700">
