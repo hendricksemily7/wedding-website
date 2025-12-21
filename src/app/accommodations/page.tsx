@@ -3,19 +3,19 @@ import Image from 'next/image';
 
 // Array of hotel data with added description field
 const hotels = [
+	// {
+	// 	id: 1,
+	// 	name: 'Holiday Inn, Saint Albans',
+	// 	imageSrc: '/holiday3.jpg',
+	// 	link: 'https://www.ihg.com/holidayinnexpress/hotels/us/en/st-albans-city/btvsa/hoteldetail',
+	// 	address: '813 Fairfax Rd, St Albans City, VT 05478',
+	// 	price: '$$$',
+	// 	phone: '(802) 524-3300',
+	// 	description:
+	// 		'A very convenient option, located under 15 minutes from our venue. This hotel is also pet friendly and has a daily hot breakfast buffet! It even includes a fitness center and a pool.',
+	// },
 	{
 		id: 1,
-		name: 'Holiday Inn, Saint Albans',
-		imageSrc: '/holiday3.jpg',
-		link: 'https://www.ihg.com/holidayinnexpress/hotels/us/en/st-albans-city/btvsa/hoteldetail',
-		address: '813 Fairfax Rd, St Albans City, VT 05478',
-		price: '$$$',
-		phone: '(802) 524-3300',
-		description:
-			'A very convenient option, located under 15 minutes from our venue. This hotel is also pet friendly and has a daily hot breakfast buffet! It even includes a fitness center and a pool.',
-	},
-	{
-		id: 2,
 		name: 'Hampton Inn, Saint Albans',
 		imageSrc: '/hampton.jpg',
 		link: 'https://www.hilton.com/en/hotels/btvsahx-hampton-st-albans/',
@@ -26,7 +26,7 @@ const hotels = [
 			'A great option with modern amenities, also a short drive from the festivities. Pet friendly but includes a pet fee. Has EV charging next door.',
 	},
 	{
-		id: 3,
+		id: 2,
 		name: 'Inn at Buckhollow Farm, Fairfax',
 		imageSrc: '/buckHollowInn.webp',
 		link: 'https://www.innatbuckhollow.com/',

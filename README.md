@@ -37,7 +37,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 ## Notes ##
-* on the RSVP include shuttle - will you need
+* Home page: Picture, welcome message, event details + location
+* Clean up shuttle RSVP look + feel
+* After home: Schedule/Itinerary: A breakdown of key event timings (e.g., ceremony start, cocktail hour, reception end)
+* Travel / Accommodations - hotel blocks, airport, transportation details
+* Need to build in RSVP flow for rehersal dinner people
 * View your RSVP selection - food can change until certsin date
-* Address is wrong on the Colchester hotel
-* Schedule goes on Home
+* Registry tab after RSVP
+* FAQ - dresscode, parking, plus 1, weather considerations
