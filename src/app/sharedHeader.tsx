@@ -35,21 +35,21 @@ const SharedHeader: React.FC<HeaderProps> = ({
           {coupleNames}
         </h1>
         <p
-          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
+          className={`${playfair.className} text-xl md:text-base text-center`}
         >
           {eventDetails}
         </p>
         <p
-          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
+          className={`${playfair.className} text-xl md:text-base text-center`}
         >
           {countdown}
         </p>
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#E9F0EC]">
+      <nav className="bg-[#95a6a0]">
         {/* Mobile toggle button */}
-        <div className="flex justify-between items-center px-6 pt-10 md:hidden text-xl">
+        <div className={`${playfair.className} flex justify-between items-center px-6 pt-10 md:hidden text-xl`}>
           <span className="font-semibold text-md">
             {!isOpen ? menuLabel.toUpperCase() : ''}
           </span>
@@ -65,7 +65,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
 
         {/* Links */}
         <ul
-          className={`
+          className={`${playfair.className} 
             flex flex-wrap justify-center gap-4 px-6 pt-10 text-xl
             md:flex-row md:items-center md:justify-center
             ${isOpen ? 'flex flex-col' : 'hidden'} md:flex

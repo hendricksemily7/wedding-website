@@ -38,7 +38,6 @@ export default function MealSelectionPage() {
   };
 
   return (
-      // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
       <div className="flex items-center justify-center w-full">
 
         <div className="bg-white shadow-md rounded-lg p-5 w-full max-w-2xl flex flex-col">
@@ -53,7 +52,7 @@ export default function MealSelectionPage() {
               key={meal.id}
               className={`block border p-4 rounded-xl cursor-pointer transition
                 ${selectedMeal === meal.id
-                  ? "border-[#2D4D3A] bg-[#E9F0EC]"
+                  ? "border-[#2D4D3A] bg-[#95a6a0]"
                   : "border-gray-200 bg-white"}
               `}
             >
@@ -75,7 +74,7 @@ export default function MealSelectionPage() {
           disabled={!selectedMeal}
           className={`mt-6 border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition
             ${selectedMeal
-              ? "bg-transparent hover:bg-[#E9F0EC] cursor-pointer"
+              ? "bg-transparent hover:bg-[#95a6a0] cursor-pointer"
               : "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"}
           mx-auto`}
         >

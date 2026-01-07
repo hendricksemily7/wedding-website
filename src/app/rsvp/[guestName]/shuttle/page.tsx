@@ -74,7 +74,7 @@ export default function ShuttlePage() {
             disabled={!shuttleInterest}
             className={`text-center items-center border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition
               ${shuttleInterest && (shuttleInterest === "no" || shuttleInterest === "yes")
-                ? "bg-transparent hover:bg-[#E9F0EC] cursor-pointer"
+                ? "bg-transparent hover:bg-[#95a6a0] cursor-pointer"
                 : "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"}
             `}
           >

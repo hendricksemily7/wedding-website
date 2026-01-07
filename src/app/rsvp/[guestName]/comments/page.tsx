@@ -26,7 +26,6 @@ const handleNext = () => {
 
 
   return (
-    // <div className="flex items-center justify-center w-full px-6 py-12 bg-[#E9F0EC]">
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg p-10 w-full max-w-2xl flex flex-col items-center">
 
       <h1 className={`${playfair.className} text-3xl font-semibold mb-4`}>Dietary Restrictions or Notes</h1>
@@ -38,7 +37,7 @@ const handleNext = () => {
       />
         <button
           onClick={handleNext}
-          className={`mt-6 w-full border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition bg-transparent hover:bg-[#E9F0EC] cursor-pointer`}
+          className={`mt-6 w-full border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition bg-transparent hover:bg-[#95a6a0] cursor-pointer`}
         >
           Continue
         </button>

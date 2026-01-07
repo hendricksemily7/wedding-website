@@ -24,20 +24,19 @@ export default function RootLayout({
         - min-w-screen: ensures it spans the full width
         - bg-[#d5dad47f]: soft custom background color
       */}
-      <body className="font-sans min-h-screen min-w-screen">
-      <div className="">
-        {/* < Image src="/drawing-removebg-preview.png" alt="Wedding photo" width={500} height={300} className="md:max-w-[600px] w-full md:rounded-lg h-auto mx-auto" /> */}
-      {/* < Image src="/Shadow-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
-      {/* < Image src="/TRY-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
-       < Image src="/Notes_251129_133244-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" />
-       {/* < Image src="/Untitled_design-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="md:max-w-[900px] w-full md:rounded-lg h-auto mx-auto" /> */}
+      <body
+        className="font-sans min-h-screen min-w-screen"
+      >
+      <div className="bg-[#95a6a0] w-full flex justify-center">
+       {/* < Image src="/Notes_251129_133244-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="max-w-xs md:max-w-md w-full md:rounded-lg h-auto mx-auto" /> */}
+       < Image src="/drawing-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="max-w-xs md:max-w-md w-full md:rounded-lg h-auto mx-auto" />
       </div>
         {/*
           Header wrapper:
           - bg-[#d5dad47f]: gives the header a consistent light gray background
           - w-full: ensures the header spans the entire width of the screen
         */}
-        <div className="w-full">
+        <div className="bg-[#95a6a0] w-full">
           <SharedHeader
             coupleNames="EMILY & JESS"
             eventDetails="SEPTEMBER 26, 2026 • FAIRFAX, VT"
@@ -56,7 +55,7 @@ export default function RootLayout({
           - pb-4: slightly smaller bottom padding so footer isn't flush against edge
           - gap-16: spacing between main content and footer
         */}
-          <div className="grid min-h-screen grid-rows-[1fr_auto] p-10 pb-4 bg-[#E9F0EC]">
+          <div className="grid min-h-screen grid-rows-[1fr_auto] p-10 pb-4 bg-[#95a6a0]">
           
           {/*
             main:
@@ -74,7 +73,7 @@ export default function RootLayout({
               - mx-auto: centers this wrapper horizontally when max width kicks in
               - flex flex-col gap-[32px]: vertical stacking with 32px spacing between children
             */}
-            <div className="w-full max-w-[1600px] mx-auto flex flex-col gap-[32px] bg-[#E9F0EC]">
+            <div className="w-full max-w-[1600px] mx-auto flex flex-col gap-[32px] bg-[#95a6a0]">
               {children}
             </div>
           </main>

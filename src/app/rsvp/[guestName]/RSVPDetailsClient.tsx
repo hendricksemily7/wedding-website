@@ -39,13 +39,13 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
         <div className="text-lg flex justify-center gap-4 md:gap-8 mb-8 flex-wrap">
           <button
             onClick={handleWillAttend}
-            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
+            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
           >
             Will Attend
           </button>
           <button
             onClick={handleWillNotAttend}
-            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
+            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
           >
             Will Not Attend
           </button>

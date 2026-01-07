@@ -25,7 +25,7 @@ export default function Page() {
     <div className="w-full max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         {/* Optional: RSVP illustration or photo */}
-        <div className="w-full md:w-1/2 rounded-lg overflow-hidden flex justify-center items-center bg-[#E9F0EC]">
+        <div className="w-full md:w-1/2 rounded-lg overflow-hidden flex justify-center items-center bg-[#95a6a0]">
           <Image
             src="/bwhands.jpg"
             alt="RSVP illustration"
@@ -57,7 +57,7 @@ export default function Page() {
               />
               <button
                 type="submit"
-                className="w-full border border-[#2D4D3A] text-[#2D4D3A] bg-transparent py-3 rounded-md font-medium tracking-wide hover:bg-[#E9F0EC] transition"
+                className="w-full border border-[#2D4D3A] text-[#2D4D3A] bg-transparent py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
               >
                 Find RSVP
               </button>
