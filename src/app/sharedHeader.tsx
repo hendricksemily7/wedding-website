@@ -12,15 +12,13 @@ const playfair = Playfair_Display({
 
 interface HeaderProps {
   coupleNames: string;
-  eventDetails: string;
-  countdown: string;
+  // eventDetails: string;
   navLinksList: { label: string; href: string, target: string }[];
 }
 
 const SharedHeader: React.FC<HeaderProps> = ({
   coupleNames,
-  eventDetails,
-  countdown,
+  // eventDetails,
   navLinksList,
 }) => {
   const pathname = usePathname() as string;
@@ -29,70 +27,59 @@ const SharedHeader: React.FC<HeaderProps> = ({
 
   return (
     <header className="">
-      {/* Top info section */}
-      <div className="flex flex-col items-center pb-5">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl text-center`}>
-          {coupleNames}
-        </h1>
-        <p
-          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
-        >
-          {eventDetails}
-        </p>
-        <p
-          className={`${playfair.className} text-xl md:text-base text-stone-500 text-center`}
-        >
-          {countdown}
-        </p>
-      </div>
-
-      {/* Navigation */}
-      <nav className="bg-[#E9F0EC]">
-        {/* Mobile toggle button */}
-        <div className="flex justify-between items-center px-6 pt-10 md:hidden text-xl">
-          <span className="font-semibold text-md">
-            {!isOpen ? menuLabel.toUpperCase() : ''}
-          </span>
-          <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
-            {/* Simple hamburger */}
-            <div className="space-y-1">
-              <span className="block w-6 h-0.5 bg-gray-800"></span>
-              <span className="block w-6 h-0.5 bg-gray-800"></span>
-              <span className="block w-6 h-0.5 bg-gray-800"></span>
+      <div className="w-full mx-auto px-4 md:px-8">        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          {/* info section */}
+          <h1 className={`${playfair.className} text-xl md:text-2xl text-left`}>
+            {coupleNames}
+          </h1>
+          {/* Navigation */}
+          <nav className="w-full md:w-auto md:flex-1">
+            {/* Mobile toggle button */}
+            <div className="flex text-right md:hidden text-xl">
+              <span className="font-semibold text-md">
+                {!isOpen ? menuLabel.toUpperCase() : ''}
+              </span>
+              <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
+                {/* Simple hamburger */}
+                <div className="space-y-1">
+                  <span className="block w-6 h-0.5 bg-gray-800"></span>
+                  <span className="block w-6 h-0.5 bg-gray-800"></span>
+                  <span className="block w-6 h-0.5 bg-gray-800"></span>
+                </div>
+              </button>
             </div>
-          </button>
+
+            {/* Links */}
+            <ul
+              className={`
+                flex flex-wrap gap-4 text-xl
+                md:flex-row md:items-center md:justify-end
+                ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
+              `}
+            >
+              {navLinksList.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      target={link.target}
+                      className={`
+                        px-3 py-2 rounded transition-colors
+                        ${isActive ? 'text-[#5F8575]' : 'text-gray-800'}
+                        hover:text-[#5F8575]
+                      `}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
-
-        {/* Links */}
-        <ul
-          className={`
-            flex flex-wrap justify-center gap-4 px-6 pt-10 text-xl
-            md:flex-row md:items-center md:justify-center
-            ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
-          `}
-        >
-          {navLinksList.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  target={link.target}
-                  className={`
-                    font-semibold px-3 py-2 rounded transition-colors
-                    ${isActive ? 'text-[#5F8575]' : 'text-gray-800'}
-                    hover:text-[#5F8575]
-                  `}
-                  onClick={() => setIsOpen(false)}
-
-                >
-                  {link.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      </div>
     </header>
   );
 };
