@@ -13,6 +13,7 @@ datasource db {
 model Guest {
   id            String   @id @default(cuid())
   name          String
+  slug          String   @unique
   email         String?
   phone         String?
   partySize     Int      @default(1)
@@ -26,7 +27,7 @@ model RSVP {
   guestId       String      @unique
   guest         Guest       @relation(fields: [guestId], references: [id], onDelete: Cascade)
   attending     Boolean
-  mealChoice    MealChoice?
+  mealChoices   Json?       // Array of meal choices, e.g. ["CHICKEN", "PASTA"]
   dietaryNotes  String?
   needsShuttle  Boolean     @default(false)
   comments      String?

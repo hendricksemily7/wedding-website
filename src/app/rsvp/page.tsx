@@ -17,7 +17,13 @@ export default function Page() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    const slug = name.trim().toLowerCase().replace(/\s+/g, "-");
+    // Generate slug: lowercase, remove special chars, replace spaces with hyphens
+    const slug = name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // remove special characters like &
+      .replace(/\s+/g, '-')          // replace spaces with hyphens
+      .replace(/-+/g, '-');          // remove consecutive hyphens
     router.push(`/rsvp/${slug}`);
   };
 

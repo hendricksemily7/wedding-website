@@ -45,3 +45,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 * View your RSVP selection - food can change until certsin date
 * Registry tab after RSVP
 * FAQ - dresscode, parking, plus 1, weather considerations
+
+# TOdo
+i think i need to create parties together with a common name, and individual names
+a party will have multiple guests. each guest has a 1:1 relationship with RSVP

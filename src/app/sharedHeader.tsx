@@ -6,7 +6,7 @@ import { navLinksDict } from './utils';
 import { Playfair_Display } from 'next/font/google';
 
 const playfair = Playfair_Display({
-  weight: '400',
+  weight: '500',
   subsets: ['latin'],
 });
 

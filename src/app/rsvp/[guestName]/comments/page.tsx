@@ -14,14 +14,15 @@ export default function CommentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { guestName } = useParams();
-  const meal = searchParams.get("meal");
+  const meals = searchParams.get("meals");
   const [comments, setComments] = useState("");
 
 const handleNext = () => {
-    // Save to database or send to API here
-    // alert(`Saved!\nGuest: ${guestName}\nMeal: ${meal}\nComments: ${comments}`);
-    // route to shuttle RSVP page
-    router.push(`/rsvp/${guestName}/shuttle`);
+    // Pass meals and comments to the shuttle page for final submission
+    const params = new URLSearchParams();
+    if (meals) params.set("meals", meals);
+    if (comments) params.set("comments", comments);
+    router.push(`/rsvp/${guestName}/shuttle?${params.toString()}`);
   };
 
 

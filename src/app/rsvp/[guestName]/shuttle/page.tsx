@@ -2,6 +2,7 @@
 
 import { Playfair_Display } from "next/font/google";
 import { useState } from "react";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 
 const playfair = Playfair_Display({
   weight: "400",
@@ -9,10 +10,57 @@ const playfair = Playfair_Display({
 });
 
 export default function ShuttlePage() {
+  const router = useRouter();
+  const { guestName } = useParams();
+  const searchParams = useSearchParams();
+  const mealsParam = searchParams.get("meals");
+  const comments = searchParams.get("comments");
+  
   const [shuttleInterest, setShuttleInterest] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!shuttleInterest || !guestName) return;
+    
+    // Parse meals array from URL param
+    let mealChoices: string[] | undefined;
+    if (mealsParam) {
+      try {
+        mealChoices = JSON.parse(decodeURIComponent(mealsParam));
+      } catch (e) {
+        console.error("Failed to parse meals:", e);
+      }
+    }
+    
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/rsvp/${encodeURIComponent(guestName as string)}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          attending: true,
+          mealChoices: mealChoices || undefined,
+          dietaryNotes: comments || undefined,
+          needsShuttle: shuttleInterest === "yes",
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save RSVP");
+      }
+      
+      // Navigate to a confirmation page or back to the main RSVP page
+      router.push(`/rsvp/${guestName}?saved=true`);
+    } catch (error) {
+      console.error("Error saving RSVP:", error);
+      alert("Failed to save your RSVP. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -71,14 +119,14 @@ export default function ShuttlePage() {
           </div>
           <button
             type="submit"
-            disabled={!shuttleInterest}
+            disabled={!shuttleInterest || saving}
             className={`text-center items-center border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide transition
-              ${shuttleInterest && (shuttleInterest === "no" || shuttleInterest === "yes")
+              ${shuttleInterest && !saving
                 ? "bg-transparent hover:bg-[#95a6a0] cursor-pointer"
                 : "bg-gray-300 text-gray-500 border-gray-300 cursor-not-allowed"}
             `}
           >
-            Continue
+            {saving ? "Saving..." : "Continue"}
           </button>
         </form>
       </div>

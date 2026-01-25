@@ -68,7 +68,7 @@ export default function Page() {
 						rel="noopener noreferrer"
 						className="w-full"
 					>
-						<div className="bg-white flex flex-col md:flex-row items-center gap-4 group rounded-lg transition-all duration-200 border border-gray-300 p-4 w-full shadow-sm md:h-[250px] overflow-hidden cursor-pointer hover:shadow-2xl hover:-translate-y-1">
+						<div className="flex flex-col md:flex-row items-center gap-4 rounded-lg border border-black p-6 w-full md:h-[250px] overflow-hidden">
 							{/* Hotel image: always visible, not a link anymore */}
 							<div className="md:block">
 								<Image
@@ -79,15 +79,6 @@ export default function Page() {
 									className="md:w-[180px] md:h-[180px] md:rounded-lg md:mb-0 object-cover"
 								/>
 							</div>
-							{/* <div className="block md:hidden">
-								<Image
-									alt={hotel.name}
-									src={hotel.imageSrc}
-									width={80}
-									height={80}
-									className="w-20 h-20 rounded-full object-cover mx-auto mb-2"
-								/>
-							</div> */}
 
 							{/* Hotel details */}
 							<div className="w-full md:w-full flex flex-col items-start text-left gap-1">
