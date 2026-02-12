@@ -10,13 +10,22 @@ datasource db {
   provider = "postgresql"
 }
 
+// A Party represents an invitation - could be a single person, couple, or family
+model Party {
+  id            String   @id @default(cuid())
+  name          String   // Display name for the party, e.g., "The Smith Family" or "John & Jane"
+  slug          String   @unique
+  guests        Guest[]  // Individual people in the party
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Individual guest within a party - each can RSVP separately
 model Guest {
   id            String   @id @default(cuid())
-  name          String
-  slug          String   @unique
-  email         String?
-  phone         String?
-  partySize     Int      @default(1)
+  partyId       String
+  party         Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+  name          String   // Individual's name
   rsvp          RSVP?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -27,7 +36,7 @@ model RSVP {
   guestId       String      @unique
   guest         Guest       @relation(fields: [guestId], references: [id], onDelete: Cascade)
   attending     Boolean
-  mealChoices   Json?       // Array of meal choices, e.g. ["CHICKEN", "PASTA"]
+  mealChoice    MealChoice?
   dietaryNotes  String?
   needsShuttle  Boolean     @default(false)
   comments      String?

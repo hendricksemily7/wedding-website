@@ -12,72 +12,130 @@ export function generateSlug(name: string): string {
     .replace(/-+/g, '-');          // remove consecutive hyphens
 }
 
-// ============ Guest Queries ============
+// ============ Party Queries ============
 
-export async function getAllGuests() {
-  return prisma.guest.findMany({
-    include: { rsvp: true },
+export async function getAllParties() {
+  return prisma.party.findMany({
+    include: { 
+      guests: {
+        include: { rsvp: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
     orderBy: { name: 'asc' },
   });
 }
 
-export async function getGuestBySlug(slug: string) {
-  return prisma.guest.findUnique({
+export async function getPartyBySlug(slug: string) {
+  return prisma.party.findUnique({
     where: { slug },
-    include: { rsvp: true },
+    include: { 
+      guests: {
+        include: { rsvp: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
   });
 }
 
-export async function getGuestByName(name: string) {
-  return prisma.guest.findFirst({
-    where: { name: { equals: name, mode: 'insensitive' } },
-    include: { rsvp: true },
-  });
-}
-
-export async function getGuestById(id: string) {
-  return prisma.guest.findUnique({
+export async function getPartyById(id: string) {
+  return prisma.party.findUnique({
     where: { id },
-    include: { rsvp: true },
+    include: { 
+      guests: {
+        include: { rsvp: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
   });
 }
 
-export async function createGuest(data: {
+export async function createParty(data: {
   name: string;
-  email?: string;
-  phone?: string;
-  partySize?: number;
+  guestNames: string[]; // Array of individual guest names
 }) {
   const slug = generateSlug(data.name);
-  return prisma.guest.create({ 
+  return prisma.party.create({
     data: {
-      ...data,
+      name: data.name,
       slug,
-    }
+      guests: {
+        create: data.guestNames.map(name => ({ name })),
+      },
+    },
+    include: {
+      guests: {
+        include: { rsvp: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+}
+
+export async function updateParty(
+  id: string,
+  data: {
+    name?: string;
+  }
+) {
+  const updateData: { name?: string; slug?: string } = {};
+  
+  if (data.name) {
+    updateData.name = data.name;
+    updateData.slug = generateSlug(data.name);
+  }
+
+  return prisma.party.update({
+    where: { id },
+    data: updateData,
+    include: {
+      guests: {
+        include: { rsvp: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+}
+
+export async function deleteParty(id: string) {
+  return prisma.party.delete({
+    where: { id },
+  });
+}
+
+// ============ Guest Queries ============
+
+export async function addGuestToParty(partyId: string, name: string) {
+  return prisma.guest.create({
+    data: {
+      partyId,
+      name,
+    },
+    include: { rsvp: true },
+  });
+}
+
+export async function updateGuest(id: string, name: string) {
+  return prisma.guest.update({
+    where: { id },
+    data: { name },
+    include: { rsvp: true },
+  });
+}
+
+export async function deleteGuest(id: string) {
+  return prisma.guest.delete({
+    where: { id },
   });
 }
 
 // ============ RSVP Queries ============
 
-export async function getAllRSVPs() {
-  return prisma.rSVP.findMany({
-    include: { guest: true },
-    orderBy: { respondedAt: 'desc' },
-  });
-}
-
-export async function getRSVPByGuestId(guestId: string) {
-  return prisma.rSVP.findUnique({
-    where: { guestId },
-    include: { guest: true },
-  });
-}
-
-export async function createOrUpdateRSVP(
+export async function createOrUpdateGuestRSVP(
   guestId: string,
   data: {
     attending: boolean;
-    mealChoices?: string[];
+    mealChoice?: MealChoice;
     dietaryNotes?: string;
     needsShuttle?: boolean;
     comments?: string;
@@ -85,23 +143,37 @@ export async function createOrUpdateRSVP(
 ) {
   return prisma.rSVP.upsert({
     where: { guestId },
-    create: { guestId, ...data },
-    update: data,
+    create: { 
+      guestId, 
+      attending: data.attending,
+      mealChoice: data.mealChoice,
+      dietaryNotes: data.dietaryNotes,
+      needsShuttle: data.needsShuttle ?? false,
+      comments: data.comments,
+    },
+    update: {
+      attending: data.attending,
+      mealChoice: data.mealChoice,
+      dietaryNotes: data.dietaryNotes,
+      needsShuttle: data.needsShuttle,
+      comments: data.comments,
+      respondedAt: new Date(),
+    },
   });
 }
 
-export async function updateRSVP(
-  guestId: string,
-  data: Partial<{
+// Batch update RSVPs for multiple guests in a party
+export async function updatePartyRSVPs(
+  rsvps: Array<{
+    guestId: string;
     attending: boolean;
-    mealChoices: string[];
-    dietaryNotes: string;
-    needsShuttle: boolean;
-    comments: string;
+    mealChoice?: MealChoice;
+    dietaryNotes?: string;
+    needsShuttle?: boolean;
+    comments?: string;
   }>
 ) {
-  return prisma.rSVP.update({
-    where: { guestId },
-    data,
-  });
+  return Promise.all(
+    rsvps.map(rsvp => createOrUpdateGuestRSVP(rsvp.guestId, rsvp))
+  );
 }

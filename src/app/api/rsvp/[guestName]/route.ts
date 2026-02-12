@@ -1,6 +1,7 @@
-import { getGuestBySlug, createOrUpdateRSVP } from '@/db/guests';
+import { getPartyBySlug, updatePartyRSVPs } from '@/db/guests';
+import type { MealChoice } from '@/generated/prisma/client';
 
-// GET /api/rsvp/[guestName] - Get a guest's RSVP by slug
+// GET /api/rsvp/[guestName] - Get a party and its guests by slug
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ guestName: string }> }
@@ -8,20 +9,20 @@ export async function GET(
   try {
     const { guestName } = await params;
     const slug = decodeURIComponent(guestName);
-    const guest = await getGuestBySlug(slug);
+    const party = await getPartyBySlug(slug);
 
-    if (!guest) {
-      return Response.json({ error: 'Guest not found' }, { status: 404 });
+    if (!party) {
+      return Response.json({ error: 'Party not found' }, { status: 404 });
     }
 
-    return Response.json({ guest });
+    return Response.json({ party });
   } catch (error) {
-    console.error('Failed to fetch guest:', error);
-    return Response.json({ error: 'Failed to fetch guest' }, { status: 500 });
+    console.error('Failed to fetch party:', error);
+    return Response.json({ error: 'Failed to fetch party' }, { status: 500 });
   }
 }
 
-// PUT /api/rsvp/[guestName] - Update a guest's RSVP
+// PUT /api/rsvp/[guestName] - Update RSVPs for guests in a party
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ guestName: string }> }
@@ -29,18 +30,32 @@ export async function PUT(
   try {
     const { guestName } = await params;
     const slug = decodeURIComponent(guestName);
-    const guest = await getGuestBySlug(slug);
+    const party = await getPartyBySlug(slug);
 
-    if (!guest) {
-      return Response.json({ error: 'Guest not found' }, { status: 404 });
+    if (!party) {
+      return Response.json({ error: 'Party not found' }, { status: 404 });
     }
 
     const data = await request.json();
-    const rsvp = await createOrUpdateRSVP(guest.id, data);
+    
+    // Expect an array of guest RSVPs: { rsvps: [{ guestId, attending, mealChoice, ... }] }
+    const rsvps = data.rsvps as Array<{
+      guestId: string;
+      attending: boolean;
+      mealChoice?: MealChoice;
+      dietaryNotes?: string;
+      needsShuttle?: boolean;
+      comments?: string;
+    }>;
 
-    return Response.json({ rsvp });
+    await updatePartyRSVPs(rsvps);
+
+    // Fetch updated party
+    const updatedParty = await getPartyBySlug(slug);
+
+    return Response.json({ party: updatedParty });
   } catch (error) {
-    console.error('Failed to update RSVP:', error);
-    return Response.json({ error: 'Failed to update RSVP' }, { status: 500 });
+    console.error('Failed to update RSVPs:', error);
+    return Response.json({ error: 'Failed to update RSVPs' }, { status: 500 });
   }
 }

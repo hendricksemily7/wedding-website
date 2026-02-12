@@ -15,18 +15,26 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
+interface RSVP {
+  attending: boolean;
+  mealChoice?: string;
+  dietaryNotes?: string;
+  needsShuttle: boolean;
+  comments?: string;
+}
+
 interface Guest {
   id: string;
   name: string;
+  rsvp?: RSVP;
+}
+
+interface Party {
+  id: string;
+  name: string;
+  slug: string;
   email?: string;
-  partySize: number;
-  rsvp?: {
-    attending: boolean;
-    mealChoices?: string[];
-    dietaryNotes?: string;
-    needsShuttle: boolean;
-    comments?: string;
-  };
+  guests: Guest[];
 }
 
 interface RSVPDetailsClientProps {
@@ -35,7 +43,7 @@ interface RSVPDetailsClientProps {
 
 export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps) {
   const router = useRouter();
-  const [guest, setGuest] = useState<Guest | null>(null);
+  const [party, setParty] = useState<Party | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,10 +53,8 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
     .join(" ");
 
   useEffect(() => {
-    async function fetchGuest() {
+    async function fetchParty() {
       try {
-        console.log("Fetching guest data for:", guestName);
-        console.log("Encoded guest name:", encodeURIComponent(guestName));
         const res = await fetch(`/api/rsvp/${encodeURIComponent(guestName)}`);
         if (!res.ok) {
           if (res.status === 404) {
@@ -60,7 +66,7 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
         }
         
         const data = await res.json();
-        setGuest(data.guest);
+        setParty(data.party);
       } catch (err) {
         setError("Failed to load reservation");
       } finally {
@@ -68,16 +74,16 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
       }
     }
 
-    fetchGuest();
+    fetchParty();
   }, [guestName]);
 
-  const handleWillAttend = () => {
-    router.push(`/rsvp/${guestName}/meal`);
+  const handleStartRSVP = () => {
+    router.push(`/rsvp/${guestName}/respond`);
   };
 
-  const handleWillNotAttend = () => {
-    router.push(`/rsvp/${guestName}/decline`);
-  };
+  // Check if all guests have responded
+  const allResponded = party?.guests.every(g => g.rsvp) ?? false;
+  const attendingGuests = party?.guests.filter(g => g.rsvp?.attending) ?? [];
 
   if (loading) {
     return (
@@ -105,64 +111,59 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
         <h1
           className={`${playfair.className} text-3xl md:text-5xl font-medium text-[#2D4D3A] mb-10`}
         >
-          {guest?.name || displayName}
+          {party?.name || displayName}
         </h1>
-        {guest?.rsvp && (
+        
+        {/* Show current responses if any exist */}
+        {party && party.guests.some(g => g.rsvp) && (
           <div className="mb-6 p-6 bg-[#f5f7f6] rounded-lg w-full max-w-md">
-            <h2 className="text-[#2D4D3A] font-medium text-center mb-4">Your Response</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between border-b border-gray-200 pb-2">
-                <span className="font-medium text-[#2D4D3A]">Status</span>
-                <span className="text-gray-700">{guest.rsvp.attending ? "Attending" : "Not Attending"}</span>
-              </div>
-              {guest.rsvp.mealChoices && guest.rsvp.mealChoices.length > 0 && (
-                <div className="border-b border-gray-200 pb-2">
-                  <span className="font-medium text-[#2D4D3A]">
-                    {guest.rsvp.mealChoices.length > 1 ? "Meals" : "Meal"}
-                  </span>
-                  <div className="text-gray-700 mt-1">
-                    {guest.rsvp.mealChoices.map((mealId, index) => (
-                      <div key={index} className="text-right">
-                        {guest.partySize > 1 && `Guest ${index + 1}: `}
-                        {getFriendlyMealName(mealId)}
+            <h2 className="text-[#2D4D3A] font-medium text-center mb-4">Your Responses</h2>
+            <div className="space-y-4">
+              {party.guests.map((guest) => (
+                <div key={guest.id} className="border-b border-gray-200 pb-3 last:border-0 last:pb-0">
+                  <div className="font-medium text-[#2D4D3A] mb-2">{guest.name}</div>
+                  {guest.rsvp ? (
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Status</span>
+                        <span className={guest.rsvp.attending ? "text-green-700" : "text-red-700"}>
+                          {guest.rsvp.attending ? "Attending" : "Not Attending"}
+                        </span>
                       </div>
-                    ))}
-                  </div>
+                      {guest.rsvp.attending && guest.rsvp.mealChoice && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Meal</span>
+                          <span className="text-gray-700">{getFriendlyMealName(guest.rsvp.mealChoice)}</span>
+                        </div>
+                      )}
+                      {guest.rsvp.attending && guest.rsvp.needsShuttle && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Shuttle</span>
+                          <span className="text-gray-700">Yes</span>
+                        </div>
+                      )}
+                      {guest.rsvp.dietaryNotes && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Notes</span>
+                          <span className="text-gray-700 text-right max-w-[150px]">{guest.rsvp.dietaryNotes}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-sm text-gray-500">No response yet</span>
+                  )}
                 </div>
-              )}
-              {guest.rsvp.dietaryNotes && (
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="font-medium text-[#2D4D3A]">Notes</span>
-                  <span className="text-gray-700 text-right max-w-[200px]">{guest.rsvp.dietaryNotes}</span>
-                </div>
-              )}
-              {guest.rsvp.needsShuttle !== undefined && (
-                <div className="flex justify-between border-b border-gray-200 pb-2">
-                  <span className="font-medium text-[#2D4D3A]">Shuttle</span>
-                  <span className="text-gray-700">{guest.rsvp.needsShuttle ? "Yes" : "No"}</span>
-                </div>
-              )}
-              {guest.rsvp.comments && (
-                <div className="flex justify-between pb-2">
-                  <span className="font-medium text-[#2D4D3A]">Comments</span>
-                  <span className="text-gray-700 text-right max-w-[200px]">{guest.rsvp.comments}</span>
-                </div>
-              )}
+              ))}
             </div>
           </div>
         )}
+        
         <div className="text-lg flex justify-center gap-4 md:gap-8 mb-8 flex-wrap">
           <button
-            onClick={handleWillAttend}
+            onClick={handleStartRSVP}
             className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
           >
-            {guest?.rsvp ? "Update Response" : "Will Attend"}
-          </button>
-          <button
-            onClick={handleWillNotAttend}
-            className="w-49 bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
-          >
-            Will Not Attend
+            {allResponded ? "Update Response" : "RSVP Now"}
           </button>
         </div>
         <div className="text-lg text-[#2D4D3A] space-y-3 text-center">

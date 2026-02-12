@@ -1,29 +1,28 @@
 import { prisma } from '@/lib/prisma';
+import { generateSlug, getPartyById, updateParty, deleteParty, addGuestToParty, updateGuest, deleteGuest, createOrUpdateGuestRSVP } from '@/db/guests';
+import type { MealChoice } from '@/generated/prisma/client';
 
-// GET /api/admin/guests/[id] - Get a specific guest
+// GET /api/admin/guests/[id] - Get a specific party
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const guest = await prisma.guest.findUnique({
-      where: { id },
-      include: { rsvp: true },
-    });
+    const party = await getPartyById(id);
 
-    if (!guest) {
-      return Response.json({ error: 'Guest not found' }, { status: 404 });
+    if (!party) {
+      return Response.json({ error: 'Party not found' }, { status: 404 });
     }
 
-    return Response.json({ guest });
+    return Response.json({ party });
   } catch (error) {
-    console.error('Failed to fetch guest:', error);
-    return Response.json({ error: 'Failed to fetch guest' }, { status: 500 });
+    console.error('Failed to fetch party:', error);
+    return Response.json({ error: 'Failed to fetch party' }, { status: 500 });
   }
 }
 
-// PUT /api/admin/guests/[id] - Update a guest
+// PUT /api/admin/guests/[id] - Update a party, guest, or RSVP
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -32,39 +31,57 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
     
-    const guest = await prisma.guest.update({
-      where: { id },
-      data: {
+    // Check if this is a guest update, party update, or RSVP update
+    if (data.type === 'guest') {
+      // Update individual guest name
+      const guest = await updateGuest(id, data.name);
+      return Response.json({ guest });
+    } else if (data.type === 'addGuest') {
+      // Add a new guest to the party
+      const guest = await addGuestToParty(id, data.name);
+      return Response.json({ guest });
+    } else if (data.type === 'rsvp') {
+      // Update guest's RSVP (id is the guestId here)
+      const rsvp = await createOrUpdateGuestRSVP(id, {
+        attending: data.attending,
+        mealChoice: data.mealChoice as MealChoice | undefined,
+        dietaryNotes: data.dietaryNotes,
+        needsShuttle: data.needsShuttle,
+        comments: data.comments,
+      });
+      return Response.json({ rsvp });
+    } else {
+      // Update party details
+      const party = await updateParty(id, {
         name: data.name,
-        email: data.email || null,
-        phone: data.phone || null,
-        partySize: data.partySize || 1,
-      },
-      include: { rsvp: true },
-    });
-
-    return Response.json({ guest });
+      });
+      return Response.json({ party });
+    }
   } catch (error) {
-    console.error('Failed to update guest:', error);
-    return Response.json({ error: 'Failed to update guest' }, { status: 500 });
+    console.error('Failed to update:', error);
+    return Response.json({ error: 'Failed to update' }, { status: 500 });
   }
 }
 
-// DELETE /api/admin/guests/[id] - Delete a guest
+// DELETE /api/admin/guests/[id] - Delete a party or guest
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    const url = new URL(request.url);
+    const type = url.searchParams.get('type');
     
-    await prisma.guest.delete({
-      where: { id },
-    });
+    if (type === 'guest') {
+      await deleteGuest(id);
+    } else {
+      await deleteParty(id);
+    }
 
     return Response.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete guest:', error);
-    return Response.json({ error: 'Failed to delete guest' }, { status: 500 });
+    console.error('Failed to delete:', error);
+    return Response.json({ error: 'Failed to delete' }, { status: 500 });
   }
 }
