@@ -36,6 +36,19 @@ export default function Page() {
         <FaMapPin className="text-black-600 text-lg" />
         <span className="text-gray-700">117 Highbridge Rd, Fairfax, VT 05454</span>
       </div>
+
+      {/* Map */}
+      <div className="mt-8 w-full h-80 md:h-96 rounded-2xl overflow-hidden shadow-lg">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2828.5!2d-72.9397!3d44.6647!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cb58a8b8b8b8b8b%3A0x0!2s117%20Highbridge%20Rd%2C%20Fairfax%2C%20VT%2005454!5e0!3m2!1sen!2sus!4v1234567890"
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+      </div>
     </div>
   );
 }

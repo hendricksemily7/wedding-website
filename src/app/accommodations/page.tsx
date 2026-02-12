@@ -1,113 +1,122 @@
-// src/app/travel/page.tsx
-import Image from 'next/image';
+// src/app/accommodations/page.tsx
+import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
+import { FaMapMarkerAlt, FaPhone, FaDollarSign } from "react-icons/fa";
 
-// Array of hotel data with added description field
+const playfair = Playfair_Display({
+  weight: "400",
+  subsets: ["latin"],
+});
+
 const hotels = [
-	// {
-	// 	id: 1,
-	// 	name: 'Holiday Inn, Saint Albans',
-	// 	imageSrc: '/holiday3.jpg',
-	// 	link: 'https://www.ihg.com/holidayinnexpress/hotels/us/en/st-albans-city/btvsa/hoteldetail',
-	// 	address: '813 Fairfax Rd, St Albans City, VT 05478',
-	// 	price: '$$$',
-	// 	phone: '(802) 524-3300',
-	// 	description:
-	// 		'A very convenient option, located under 15 minutes from our venue. This hotel is also pet friendly and has a daily hot breakfast buffet! It even includes a fitness center and a pool.',
-	// },
-	{
-		id: 1,
-		name: 'Hampton Inn, Saint Albans',
-		imageSrc: '/hampton.jpg',
-		link: 'https://www.hilton.com/en/hotels/btvsahx-hampton-st-albans/',
-		address: '43 Lake St, St Albans City, VT 05478',
-		price: '$289/night',
-		phone: '(802) 528-5020',
-		description:
-			'A great option with modern amenities, also a short drive from the festivities. Pet friendly but includes a pet fee. Has EV charging next door.',
-	},
-	{
-		id: 2,
-		name: 'Inn at Buckhollow Farm, Fairfax',
-		imageSrc: '/buckHollowInn.webp',
-		link: 'https://www.innatbuckhollow.com/',
-		address: '2150 Buck Hollow Rd, Fairfax, VT 05454',
-		price: '$211/night',
-		phone: '(802) 849-2400',
-		description:
-			'Located in close proximity of the venue, this adorable bed & breakfast offers 4 bedrooms (3 queens, 1 king). Includes full Vermont country breakfast.',
-	},
+  {
+    id: 1,
+    name: "Hampton Inn",
+    location: "Saint Albans",
+    imageSrc: "/hampton.jpg",
+    link: "https://www.hilton.com/en/hotels/btvsahx-hampton-st-albans/",
+    address: "43 Lake St, St Albans City, VT 05478",
+    price: "$289/night",
+    phone: "(802) 528-5020",
+    description:
+      "A great option with modern amenities, a short drive from the festivities. Pet friendly (fee applies). EV charging available next door.",
+  },
+  {
+    id: 2,
+    name: "Inn at Buck Hollow Farm",
+    location: "Fairfax",
+    imageSrc: "/buckHollowInn.webp",
+    link: "https://www.innatbuckhollow.com/",
+    address: "2150 Buck Hollow Rd, Fairfax, VT 05454",
+    price: "$211/night",
+    phone: "(802) 849-2400",
+    description:
+      "A charming bed & breakfast just minutes from the venue. 4 cozy rooms available with full Vermont country breakfast included.",
+  },
 ];
 
 export default function Page() {
-	return (
-		// Add border and padding to the main container
-		// Use `p-6` for some spacing inside the border
-		<div className="w-full max-w-[1100px] mx-auto rounded-lg">
-			<div className="text-center pb-10">
-				<p className="text-xl md:text-lg">
-					We are doing a hotel room block at three different hotels all within 25
-					minutes of the venue.
-				</p>
-				<p className="text-xl md:text-lg">
-					To get our hotel block rate, please give the hotel a call, and let them
-					know you are attending the Hendricks-Okrant wedding.
-				</p>
-				<p className="text-xl md:text-lg">
-					Outside of these options, guests may be interested in exploring
-					accommodations on Airbnb and VRBO.
-				</p>
-			</div>
+  return (
+    <div className="w-full max-w-4xl mx-auto px-6">
+      {/* Header */}
+      <h1
+        className={`${playfair.className} text-2xl md:text-3xl text-center mb-6`}
+      >
+        Accommodations
+      </h1>
 
-			{/* Container for all accommodations */}
-			<div className="flex flex-col gap-8 items-center">
-				{hotels.map((hotel) => (
-					<a
-						key={hotel.id}
-						href={hotel.link}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="w-full"
-					>
-						<div className="flex flex-col md:flex-row items-center gap-4 rounded-lg border border-black p-6 w-full md:h-[250px] overflow-hidden">
-							{/* Hotel image: always visible, not a link anymore */}
-							<div className="md:block">
-								<Image
-									alt={hotel.name}
-									src={hotel.imageSrc}
-									width={180}
-									height={180}
-									className="md:w-[180px] md:h-[180px] md:rounded-lg md:mb-0 object-cover"
-								/>
-							</div>
+      {/* Intro */}
+      <div className="text-center mb-12 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-700 mb-4">
+          We have room blocks at two hotels within 25 minutes of the venue.
+        </p>
+        <p className="text-gray-600">
+          Call and mention the <span className="font-semibold">Hendricks-Okrant wedding</span> for our group rate.
+        </p>
+      </div>
 
-							{/* Hotel details */}
-							<div className="w-full md:w-full flex flex-col items-start text-left gap-1">
-								<h1 className="text-2xl md:text-xl font-semibold">
-									{hotel.name}
-								</h1>
-								<p className="text-lg md:text-lg">
-									{hotel.description}
-								</p>
-								<div className="flex flex-col gap-1 mt-2 text-base md:text-base">
-									<span>
-										<b>Address:</b> {hotel.address}
-									</span>
-									<span>
-										<b>Phone:</b> {hotel.phone}
-									</span>
-									<span>
-										<b>Price:</b> {hotel.price}
-									</span>
-								</div>
-								{/* Website link: show only on mobile */}
-								<span className="mt-2 text-[#2D4D3A] underline font-medium text-base md:text-sm block md:hidden">
-									Website
-								</span>
-							</div>
-						</div>
-					</a>
-				))}
-			</div>
-		</div>
-	);
+      {/* Hotel Cards */}
+      <div className="flex flex-col gap-12">
+        {hotels.map((hotel) => (
+          <div
+            key={hotel.id}
+            className="bg-stone-100 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+          >
+            {/* Image */}
+            <div className="relative w-full h-56 md:h-72">
+              <Image
+                alt={hotel.name}
+                src={hotel.imageSrc}
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Content */}
+            <div className="p-6 md:p-8">
+              <div className="text-center mb-4">
+                <h2 className="text-2xl font-semibold">{hotel.name}</h2>
+                <p className="text-gray-500">{hotel.location}</p>
+              </div>
+
+              <p className="text-gray-700 text-center mb-6">{hotel.description}</p>
+
+              {/* Details with icons */}
+              <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-8 text-gray-600 mb-6">
+                <div className="flex items-center gap-2 justify-center">
+                  <FaMapMarkerAlt className="text-gray-400" />
+                  <span className="text-sm">{hotel.address}</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <FaPhone className="text-gray-400" />
+                  <span className="text-sm">{hotel.phone}</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <FaDollarSign className="text-gray-400" />
+                  <span className="text-sm">{hotel.price}</span>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="text-center">
+                <a
+                  href={hotel.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-gray-800 text-white px-8 py-3 rounded-full hover:bg-gray-700 transition-colors font-medium"
+                >
+                  View Website
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer note */}
+      <p className="text-center text-gray-500 mt-12 text-sm">
+        You may also explore options on Airbnb and VRBO.
+      </p>
+    </div>
+  );
 }

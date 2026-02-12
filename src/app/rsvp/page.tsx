@@ -43,7 +43,7 @@ export default function Page() {
         </div>
         {/* RSVP Form */}
         <div className="w-full md:w-1/2 flex flex-col items-center">
-          <div className="bg-white shadow-md rounded-lg p-10 w-full max-w-lg">
+          <div className="bg-stone-100 shadow-sm rounded-2xl p-10 w-full max-w-lg">
             <h1
               className={`${playfair.className} text-2xl md:text-3xl tracking-[0.2em] mb-8 text-[#3b3b3b]`}
             >

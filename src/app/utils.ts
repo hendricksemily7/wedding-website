@@ -9,7 +9,7 @@ export const weddingNavLinksList = [
     { label: 'Venue', href: '/venue', target: '' },
     { label: 'Registry', href: 'https://registry.theknot.com/-december-2026-vt/75002398', target: 'blank' },
     { label: 'RSVP', href: '/rsvp', target: '' },
-    { label: 'Q&A', href: '/q&a', target: '' },
+    { label: 'Q&A', href: '/qa', target: '' },
   ];
 
 export const navLinksDict: DynamicDictionary = {};
