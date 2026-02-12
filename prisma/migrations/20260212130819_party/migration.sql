@@ -9,6 +9,10 @@
   - Added the required column `partyId` to the `Guest` table without a default value. This is not possible if the table is not empty.
 
 */
+-- Clear existing data to allow schema changes
+DELETE FROM "RSVP";
+DELETE FROM "Guest";
+
 -- DropIndex
 DROP INDEX "Guest_slug_key";
 
