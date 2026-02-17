@@ -32,6 +32,12 @@ interface Party {
 }
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinError, setPinError] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const [parties, setParties] = useState<Party[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,9 +80,42 @@ export default function AdminPage() {
     }
   };
 
+  // Check if already authenticated (via sessionStorage)
   useEffect(() => {
-    fetchParties();
+    const storedAuth = sessionStorage.getItem("admin_authenticated");
+    if (storedAuth === "true") {
+      setIsAuthenticated(true);
+      fetchParties();
+    }
+    setCheckingAuth(false);
   }, []);
+
+  const handlePinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinError("");
+    setVerifying(true);
+
+    try {
+      const res = await fetch("/api/admin/verify-pin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin }),
+      });
+
+      if (res.ok) {
+        sessionStorage.setItem("admin_authenticated", "true");
+        setIsAuthenticated(true);
+        fetchParties();
+      } else {
+        setPinError("Invalid PIN");
+        setPin("");
+      }
+    } catch (err) {
+      setPinError("Verification failed. Please try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const handleAddParty = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,6 +300,55 @@ export default function AdminPage() {
   const attendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.attending).length, 0);
   const notAttendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp && !g.rsvp.attending).length, 0);
   const needsShuttleGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.needsShuttle).length, 0);
+
+  // Show loading while checking auth
+  if (checkingAuth) {
+    return (
+      <div className="w-full max-w-6xl mx-auto p-6">
+        <p className="text-center text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show PIN entry if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f7f6]">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+          <h1 className={`${playfair.className} text-2xl font-medium text-[#2D4D3A] mb-6 text-center`}>
+            Admin Access
+          </h1>
+          <form onSubmit={handlePinSubmit}>
+            <div className="mb-4">
+              <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-2">
+                Enter PIN
+              </label>
+              <input
+                type="password"
+                id="pin"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2D4D3A] focus:border-transparent text-center text-lg tracking-widest"
+                placeholder="••••"
+                autoFocus
+                disabled={verifying}
+              />
+            </div>
+            {pinError && (
+              <p className="text-red-600 text-sm mb-4 text-center">{pinError}</p>
+            )}
+            <button
+              type="submit"
+              disabled={verifying || !pin}
+              className="w-full bg-[#2D4D3A] text-white py-2 px-4 rounded-md hover:bg-[#1e3428] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {verifying ? "Verifying..." : "Enter"}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
