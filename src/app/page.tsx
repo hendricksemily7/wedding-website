@@ -8,11 +8,11 @@ const playfair = Playfair_Display({
 });
 
 const schedule = [
-  { time: "3:30 PM", event: "Guest Arrival" },
-  { time: "4:00 PM", event: "Ceremony" },
-  { time: "4:30 PM", event: "Cocktail Hour" },
-  { time: "5:30 PM", event: "First Dance" },
-  { time: "6:00 PM", event: "Dinner" },
+  { time: "4:00 PM", event: "Guest Arrival" },
+  { time: "4:30 PM", event: "Ceremony" },
+  { time: "5:00 PM", event: "Cocktail Hour" },
+  { time: "6:00 PM", event: "First Dance" },
+  { time: "6:15 PM", event: "Dinner" },
   { time: "7:00 PM", event: "Toasts" },
   { time: "7:15 PM", event: "Dancing & Dessert" },
   { time: "10:00 PM", event: "Send-Off" },
