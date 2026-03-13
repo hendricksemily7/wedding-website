@@ -14,7 +14,7 @@ const hotels = [
     name: "Hampton Inn",
     location: "Saint Albans",
     imageSrc: "/hampton.jpg",
-    link: "https://www.hilton.com/en/hotels/btvsahx-hampton-st-albans/",
+    link: "https://group.hamptoninn.com/fqaj22",
     address: "43 Lake St, St Albans City, VT 05478",
     price: "$289/night",
     phone: "(802) 528-5020",
