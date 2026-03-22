@@ -19,7 +19,7 @@ weddingNavLinksList.forEach(link => {
 });
 
 export const calculateDaysToGo = () => {
-    const weddingDate = new Date('2026-09-26');
+    const weddingDate = new Date(2026, 8, 26); // Month is 0-indexed, so 8 = September
     const today = new Date();
     const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
     const weddingUTC = Date.UTC(weddingDate.getFullYear(), weddingDate.getMonth(), weddingDate.getDate());

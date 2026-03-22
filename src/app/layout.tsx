@@ -86,7 +86,7 @@ export default function RootLayout({
             - items-center: vertically center footer content
             - justify-center: center horizontally
           */}
-          <footer className="row-start-2 flex gap-[24px] flex-wrap items-center justify-center pt-10">
+          {/* <footer className="row-start-2 flex gap-[24px] flex-wrap items-center justify-center pt-10">
             <a
               className="flex items-center gap-2 hover:underline hover:underline-offset-4"
               href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
@@ -102,7 +102,7 @@ export default function RootLayout({
               />
               Built with Next.js
             </a>
-          </footer>
+          </footer> */}
         </div>
       </body>
     </html>

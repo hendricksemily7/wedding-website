@@ -31,9 +31,9 @@ export default function Home() {
       />
 
       {/* Schedule Section */}
-      <div className="w-full max-w-2xl mx-auto px-6 mt-16 mb-12">
+      <div className={`${playfair.className} w-full max-w-2xl mx-auto px-6 mt-16 mb-12`}>
         <h2
-          className={`${playfair.className} text-2xl md:text-3xl text-center mb-10`}
+          className="text-2xl md:text-3xl text-center mb-10"
         >
           Schedule of Events
         </h2>
