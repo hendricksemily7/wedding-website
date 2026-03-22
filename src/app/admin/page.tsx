@@ -213,6 +213,19 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteAllParties = async () => {
+    if (!confirm(`Are you sure you want to delete ALL ${totalParties} parties and ${totalGuests} guests? This cannot be undone.`)) return;
+    
+    try {
+      for (const party of parties) {
+        await fetch(`/api/admin/guests/${party.id}`, { method: "DELETE" });
+      }
+      await fetchParties();
+    } catch (err) {
+      alert("Failed to delete all parties");
+    }
+  };
+
   const startEditingParty = (party: Party) => {
     setEditingPartyId(party.id);
     setEditPartyForm({
@@ -360,9 +373,19 @@ export default function AdminPage() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 md:p-6">
-      <h1 className={`${playfair.className} text-3xl md:text-4xl font-medium text-[#2D4D3A] mb-6 text-center`}>
-        Guest Admin
-      </h1>
+      <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
+        <h1 className={`${playfair.className} text-3xl md:text-4xl font-medium text-[#2D4D3A] text-center`}>
+          Guest Admin
+        </h1>
+        {totalParties > 0 && (
+          <button
+            onClick={handleDeleteAllParties}
+            className="text-sm text-red-600 hover:text-red-800 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
+          >
+            Delete All ({totalGuests} guests)
+          </button>
+        )}
+      </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
@@ -664,14 +687,12 @@ export default function AdminPage() {
                           >
                             Edit RSVP
                           </button>
-                          {party.guests.length > 1 && (
-                            <button
-                              onClick={() => handleDeleteGuest(guest.id, guest.name, party.id)}
-                              className="text-red-600 hover:text-red-800 text-sm"
-                            >
-                              Remove
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleDeleteGuest(guest.id, guest.name, party.id)}
+                            className="text-red-600 hover:text-red-800 text-sm"
+                          >
+                            Remove
+                          </button>
                         </td>
                       </>
                     )}
