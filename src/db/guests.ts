@@ -53,6 +53,7 @@ export async function getPartyById(id: string) {
 export async function createParty(data: {
   name: string;
   guestNames: string[]; // Array of individual guest names
+  weddingPartyFlags?: boolean[]; // Optional array matching guestNames order
 }) {
   const slug = generateSlug(data.name);
   return prisma.party.create({
@@ -60,7 +61,10 @@ export async function createParty(data: {
       name: data.name,
       slug,
       guests: {
-        create: data.guestNames.map(name => ({ name })),
+        create: data.guestNames.map((name, index) => ({
+          name,
+          isWeddingParty: data.weddingPartyFlags?.[index] ?? false,
+        })),
       },
     },
     include: {

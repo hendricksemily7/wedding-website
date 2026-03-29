@@ -166,9 +166,19 @@ export default function AdminPage() {
         if (!partyName) continue;
         
         // Guest names can be semicolon-separated within the CSV cell
-        const guestNames = guestNamesStr 
+        // Use asterisk (*) suffix to mark wedding party members: "John Smith*;Jane Smith"
+        const rawNames = guestNamesStr 
           ? guestNamesStr.split(";").map(n => n.trim()).filter(Boolean)
           : [partyName];
+        
+        const guestNames: string[] = [];
+        const weddingPartyFlags: boolean[] = [];
+        
+        for (const rawName of rawNames) {
+          const isWeddingParty = rawName.endsWith("*");
+          guestNames.push(isWeddingParty ? rawName.slice(0, -1).trim() : rawName);
+          weddingPartyFlags.push(isWeddingParty);
+        }
         
         await fetch("/api/rsvp", {
           method: "POST",
@@ -176,6 +186,7 @@ export default function AdminPage() {
           body: JSON.stringify({
             name: partyName,
             guestNames,
+            weddingPartyFlags,
           }),
         });
       }
@@ -496,7 +507,7 @@ export default function AdminPage() {
         {/* CSV Upload */}
         <div className="mt-4 pt-4 border-t border-gray-200">
           <p className="text-sm text-gray-600 mb-2">
-            Or upload a CSV file (columns: partyName, guestNames (semicolon-separated))
+            Or upload a CSV file (columns: partyName, guestNames). Guest names are semicolon-separated. Add * after a name to mark them as wedding party (e.g., &quot;John Smith*;Jane Smith&quot;).
           </p>
           <input
             ref={fileInputRef}

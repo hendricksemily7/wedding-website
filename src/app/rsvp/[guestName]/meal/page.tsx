@@ -7,7 +7,7 @@ import { Playfair_Display } from "next/font/google";
 export const meals = [
   {
     id: "CHICKEN",
-    name: "Airline Chicken",
+    name: "Lemon Chicken",
     description: "Lemon herb white wine sauce",
   },
   {

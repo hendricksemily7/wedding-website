@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     const party = await createParty({
       name: data.name, // Party display name
       guestNames,
+      weddingPartyFlags: data.weddingPartyFlags,
     });
     
     return Response.json({ party }, { status: 201 });
