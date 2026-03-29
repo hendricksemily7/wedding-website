@@ -20,12 +20,14 @@ interface RSVP {
   mealChoice?: string;
   dietaryNotes?: string;
   needsShuttle: boolean;
+  attendingRehearsalDinner?: boolean;
   comments?: string;
 }
 
 interface Guest {
   id: string;
   name: string;
+  isWeddingParty: boolean;
   rsvp?: RSVP;
 }
 
@@ -140,6 +142,14 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
                         <div className="flex justify-between">
                           <span className="text-gray-600">Shuttle</span>
                           <span className="text-gray-700">Yes</span>
+                        </div>
+                      )}
+                      {guest.rsvp.attending && guest.isWeddingParty && guest.rsvp.attendingRehearsalDinner !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Rehearsal Dinner</span>
+                          <span className={guest.rsvp.attendingRehearsalDinner ? "text-green-700" : "text-red-700"}>
+                            {guest.rsvp.attendingRehearsalDinner ? "Yes" : "No"}
+                          </span>
                         </div>
                       )}
                       {guest.rsvp.dietaryNotes && (

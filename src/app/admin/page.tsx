@@ -20,6 +20,7 @@ interface RSVP {
 interface Guest {
   id: string;
   name: string;
+  isWeddingParty: boolean;
   rsvp?: RSVP;
 }
 
@@ -297,9 +298,26 @@ export default function AdminPage() {
     }
   };
 
+  const handleToggleWeddingParty = async (guestId: string, currentValue: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/guests/${guestId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "guestDetails",
+          isWeddingParty: !currentValue,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      await fetchParties();
+    } catch (err) {
+      alert("Failed to update wedding party status");
+    }
+  };
+
   const getMealName = (choice?: string) => {
     const meals: Record<string, string> = {
-      CHICKEN: "Airline Chicken",
+      CHICKEN: "Lemon Chicken",
       PASTA: "Spinach Ravioli",
       SQUASH: "Stuffed Acorn Squash",
     };
@@ -580,6 +598,7 @@ export default function AdminPage() {
               <thead className="bg-gray-50 text-sm">
                 <tr>
                   <th className="px-4 py-2 font-medium text-gray-600">Guest Name</th>
+                  <th className="px-4 py-2 font-medium text-gray-600">Wedding Party</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Status</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Meal</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Shuttle</th>
@@ -593,6 +612,14 @@ export default function AdminPage() {
                     {editingRsvpGuestId === guest.id ? (
                       <>
                         <td className="px-4 py-2 font-medium">{guest.name}</td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="checkbox"
+                            checked={guest.isWeddingParty}
+                            onChange={() => handleToggleWeddingParty(guest.id, guest.isWeddingParty)}
+                            className="accent-[#2D4D3A]"
+                          />
+                        </td>
                         <td className="px-4 py-2">
                           <select
                             value={editRsvpForm.attending ? "yes" : "no"}
@@ -611,7 +638,7 @@ export default function AdminPage() {
                               className="border border-gray-300 rounded px-2 py-1 text-sm"
                             >
                               <option value="">Select meal</option>
-                              <option value="CHICKEN">Airline Chicken</option>
+                              <option value="CHICKEN">Lemon Chicken</option>
                               <option value="PASTA">Spinach Ravioli</option>
                               <option value="SQUASH">Stuffed Acorn Squash</option>
                             </select>
@@ -658,6 +685,15 @@ export default function AdminPage() {
                     ) : (
                       <>
                         <td className="px-4 py-2 font-medium">{guest.name}</td>
+                        <td className="px-4 py-2">
+                          <input
+                            type="checkbox"
+                            checked={guest.isWeddingParty}
+                            onChange={() => handleToggleWeddingParty(guest.id, guest.isWeddingParty)}
+                            className="accent-[#2D4D3A] cursor-pointer"
+                            title={guest.isWeddingParty ? "In wedding party" : "Not in wedding party"}
+                          />
+                        </td>
                         <td className="px-4 py-2">
                           {guest.rsvp ? (
                             <span

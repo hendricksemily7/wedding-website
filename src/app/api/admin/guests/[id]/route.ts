@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { generateSlug, getPartyById, updateParty, deleteParty, addGuestToParty, updateGuest, deleteGuest, createOrUpdateGuestRSVP } from '@/db/guests';
+import { generateSlug, getPartyById, updateParty, deleteParty, addGuestToParty, updateGuest, updateGuestDetails, deleteGuest, createOrUpdateGuestRSVP } from '@/db/guests';
 import type { MealChoice } from '@/generated/prisma/client';
 
 // GET /api/admin/guests/[id] - Get a specific party
@@ -35,6 +35,13 @@ export async function PUT(
     if (data.type === 'guest') {
       // Update individual guest name
       const guest = await updateGuest(id, data.name);
+      return Response.json({ guest });
+    } else if (data.type === 'guestDetails') {
+      // Update guest details including wedding party status
+      const guest = await updateGuestDetails(id, {
+        name: data.name,
+        isWeddingParty: data.isWeddingParty,
+      });
       return Response.json({ guest });
     } else if (data.type === 'addGuest') {
       // Add a new guest to the party

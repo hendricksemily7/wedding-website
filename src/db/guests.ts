@@ -123,6 +123,14 @@ export async function updateGuest(id: string, name: string) {
   });
 }
 
+export async function updateGuestDetails(id: string, data: { name?: string; isWeddingParty?: boolean }) {
+  return prisma.guest.update({
+    where: { id },
+    data,
+    include: { rsvp: true },
+  });
+}
+
 export async function deleteGuest(id: string) {
   return prisma.guest.delete({
     where: { id },
@@ -138,6 +146,7 @@ export async function createOrUpdateGuestRSVP(
     mealChoice?: MealChoice;
     dietaryNotes?: string;
     needsShuttle?: boolean;
+    attendingRehearsalDinner?: boolean;
     comments?: string;
   }
 ) {
@@ -149,6 +158,7 @@ export async function createOrUpdateGuestRSVP(
       mealChoice: data.mealChoice,
       dietaryNotes: data.dietaryNotes,
       needsShuttle: data.needsShuttle ?? false,
+      attendingRehearsalDinner: data.attendingRehearsalDinner,
       comments: data.comments,
     },
     update: {
@@ -156,6 +166,7 @@ export async function createOrUpdateGuestRSVP(
       mealChoice: data.mealChoice,
       dietaryNotes: data.dietaryNotes,
       needsShuttle: data.needsShuttle,
+      attendingRehearsalDinner: data.attendingRehearsalDinner,
       comments: data.comments,
       respondedAt: new Date(),
     },
@@ -170,6 +181,7 @@ export async function updatePartyRSVPs(
     mealChoice?: MealChoice;
     dietaryNotes?: string;
     needsShuttle?: boolean;
+    attendingRehearsalDinner?: boolean;
     comments?: string;
   }>
 ) {

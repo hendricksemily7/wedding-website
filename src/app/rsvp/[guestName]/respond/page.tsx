@@ -15,12 +15,14 @@ interface RSVP {
   mealChoice?: string;
   dietaryNotes?: string;
   needsShuttle: boolean;
+  attendingRehearsalDinner?: boolean;
   comments?: string;
 }
 
 interface Guest {
   id: string;
   name: string;
+  isWeddingParty: boolean;
   rsvp?: RSVP;
 }
 
@@ -37,6 +39,8 @@ interface GuestResponse {
   mealChoice: string | null;
   dietaryNotes: string;
   needsShuttle: boolean;
+  attendingRehearsalDinner: boolean | null;
+  isWeddingParty: boolean;
 }
 
 export default function RespondPage() {
@@ -52,7 +56,7 @@ export default function RespondPage() {
   
   // Current step in the flow
   const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
-  const [step, setStep] = useState<"attending" | "meal" | "dietary" | "shuttle" | "review">("attending");
+  const [step, setStep] = useState<"attending" | "meal" | "dietary" | "shuttle" | "rehearsalDinner" | "review">("attending");
 
   useEffect(() => {
     async function fetchParty() {
@@ -73,6 +77,8 @@ export default function RespondPage() {
           mealChoice: guest.rsvp?.mealChoice ?? null,
           dietaryNotes: guest.rsvp?.dietaryNotes ?? "",
           needsShuttle: guest.rsvp?.needsShuttle ?? false,
+          attendingRehearsalDinner: guest.rsvp?.attendingRehearsalDinner ?? null,
+          isWeddingParty: guest.isWeddingParty,
         }));
         setResponses(initialResponses);
       } catch (err) {
@@ -118,6 +124,16 @@ export default function RespondPage() {
 
   const handleShuttleChoice = (needsShuttle: boolean) => {
     updateCurrentResponse({ needsShuttle });
+    // If wedding party member, ask about rehearsal dinner
+    if (currentResponse?.isWeddingParty) {
+      setStep("rehearsalDinner");
+    } else {
+      moveToNextGuestOrReview();
+    }
+  };
+
+  const handleRehearsalDinnerChoice = (attendingRehearsalDinner: boolean) => {
+    updateCurrentResponse({ attendingRehearsalDinner });
     moveToNextGuestOrReview();
   };
 
@@ -142,6 +158,7 @@ export default function RespondPage() {
         mealChoice: r.attending ? r.mealChoice : undefined,
         dietaryNotes: r.dietaryNotes || undefined,
         needsShuttle: r.attending ? r.needsShuttle : false,
+        attendingRehearsalDinner: r.attending && r.isWeddingParty ? r.attendingRehearsalDinner : undefined,
       }));
 
       const res = await fetch(`/api/rsvp/${encodeURIComponent(guestName as string)}`, {
@@ -169,10 +186,16 @@ export default function RespondPage() {
       setCurrentGuestIndex(lastGuestIndex);
       const lastResponse = responses[lastGuestIndex];
       if (lastResponse?.attending) {
-        setStep("shuttle");
+        if (lastResponse.isWeddingParty) {
+          setStep("rehearsalDinner");
+        } else {
+          setStep("shuttle");
+        }
       } else {
         setStep("attending");
       }
+    } else if (step === "rehearsalDinner") {
+      setStep("shuttle");
     } else if (step === "shuttle") {
       setStep("dietary");
     } else if (step === "dietary") {
@@ -184,7 +207,11 @@ export default function RespondPage() {
       setCurrentGuestIndex(prev => prev - 1);
       const prevResponse = responses[currentGuestIndex - 1];
       if (prevResponse?.attending) {
-        setStep("shuttle");
+        if (prevResponse.isWeddingParty) {
+          setStep("rehearsalDinner");
+        } else {
+          setStep("shuttle");
+        }
       } else {
         setStep("attending");
       }
@@ -251,6 +278,14 @@ export default function RespondPage() {
                           <span className="text-gray-600">Shuttle</span>
                           <span className="text-gray-700">{response.needsShuttle ? "Yes" : "No"}</span>
                         </div>
+                        {response.isWeddingParty && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Rehearsal Dinner</span>
+                            <span className={response.attendingRehearsalDinner ? "text-green-700" : "text-red-700"}>
+                              {response.attendingRehearsalDinner ? "Yes" : "No"}
+                            </span>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -409,6 +444,38 @@ export default function RespondPage() {
                 className="border border-gray-300 text-gray-600 px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition"
               >
                 No, thanks
+              </button>
+            </div>
+            <button
+              onClick={goBack}
+              className="mt-6 text-gray-500 hover:text-gray-700 text-sm"
+            >
+              ← Back
+            </button>
+          </div>
+        )}
+
+        {/* Rehearsal Dinner step (wedding party only) */}
+        {step === "rehearsalDinner" && (
+          <div className="text-center">
+            <p className="text-lg text-gray-700 mb-2">
+              Will you attend the rehearsal dinner?
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              As a member of the wedding party, you&apos;re invited to join us the evening before for rehearsal and dinner.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => handleRehearsalDinnerChoice(true)}
+                className="border border-[#2D4D3A] text-[#2D4D3A] px-8 py-3 rounded-md font-medium hover:bg-[#95a6a0] transition"
+              >
+                Yes, I&apos;ll be there
+              </button>
+              <button
+                onClick={() => handleRehearsalDinnerChoice(false)}
+                className="border border-gray-300 text-gray-600 px-8 py-3 rounded-md font-medium hover:bg-gray-100 transition"
+              >
+                Sorry, can&apos;t make it
               </button>
             </div>
             <button

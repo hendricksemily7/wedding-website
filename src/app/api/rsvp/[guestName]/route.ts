@@ -45,6 +45,7 @@ export async function PUT(
       mealChoice?: MealChoice;
       dietaryNotes?: string;
       needsShuttle?: boolean;
+      attendingRehearsalDinner?: boolean;
       comments?: string;
     }>;
 

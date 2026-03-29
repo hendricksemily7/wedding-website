@@ -112,11 +112,6 @@ export default function Page() {
           </div>
         ))}
       </div>
-
-      {/* Footer note */}
-      <p className="text-center text-gray-500 mt-12 text-sm">
-        You may also explore options on Airbnb and VRBO.
-      </p>
     </div>
   );
 }
