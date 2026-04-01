@@ -162,21 +162,31 @@ export default function AdminPage() {
       const startIndex = lines[0]?.toLowerCase().includes("name") ? 1 : 0;
       
       for (let i = startIndex; i < lines.length; i++) {
-        const [partyName, guestNamesStr] = lines[i].split(",").map(s => s.trim());
+        const [partyName, guestNamesStr, weddingPartyStr] = lines[i].split(",").map(s => s.trim());
         if (!partyName) continue;
         
         // Guest names can be semicolon-separated within the CSV cell
-        // Use asterisk (*) suffix to mark wedding party members: "John Smith*;Jane Smith"
+        // Use asterisk (*) suffix OR third column to mark wedding party members
         const rawNames = guestNamesStr 
           ? guestNamesStr.split(";").map(n => n.trim()).filter(Boolean)
           : [partyName];
         
+        // Parse wedding party column if provided (semicolon-separated: "yes;no" or "true;false" or "1;0")
+        const weddingPartyValues = weddingPartyStr 
+          ? weddingPartyStr.split(";").map(v => v.trim().toLowerCase())
+          : [];
+        
         const guestNames: string[] = [];
         const weddingPartyFlags: boolean[] = [];
         
-        for (const rawName of rawNames) {
-          const isWeddingParty = rawName.endsWith("*");
-          guestNames.push(isWeddingParty ? rawName.slice(0, -1).trim() : rawName);
+        for (let j = 0; j < rawNames.length; j++) {
+          const rawName = rawNames[j];
+          // Check for asterisk suffix first, then fall back to third column
+          const hasAsterisk = rawName.endsWith("*");
+          const fromColumn = weddingPartyValues[j] === "yes" || weddingPartyValues[j] === "true" || weddingPartyValues[j] === "1";
+          const isWeddingParty = hasAsterisk || fromColumn;
+          
+          guestNames.push(hasAsterisk ? rawName.slice(0, -1).trim() : rawName);
           weddingPartyFlags.push(isWeddingParty);
         }
         
@@ -506,9 +516,9 @@ export default function AdminPage() {
 
         {/* CSV Upload */}
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-600 mb-2">
-            Or upload a CSV file (columns: partyName, guestNames). Guest names are semicolon-separated. Add * after a name to mark them as wedding party (e.g., &quot;John Smith*;Jane Smith&quot;).
-          </p>
+          {/* <p className="text-sm text-gray-600 mb-2">
+            Or upload a CSV file (columns: partyName, guestNames, weddingParty). Guest names and wedding party flags are semicolon-separated. Use &quot;yes/true/1&quot; for wedding party (e.g., &quot;yes;no&quot;) or add * after a name.
+          </p> */}
           <input
             ref={fileInputRef}
             type="file"
@@ -622,7 +632,12 @@ export default function AdminPage() {
                   <tr key={guest.id} className="border-t border-gray-100 hover:bg-gray-50">
                     {editingRsvpGuestId === guest.id ? (
                       <>
-                        <td className="px-4 py-2 font-medium">{guest.name}</td>
+                        <td className="px-4 py-2 font-medium">
+                          {guest.name}
+                          {guest.isWeddingParty && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">WP</span>
+                          )}
+                        </td>
                         <td className="px-4 py-2">
                           <input
                             type="checkbox"
@@ -695,7 +710,12 @@ export default function AdminPage() {
                       </>
                     ) : (
                       <>
-                        <td className="px-4 py-2 font-medium">{guest.name}</td>
+                        <td className="px-4 py-2 font-medium">
+                          {guest.name}
+                          {guest.isWeddingParty && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">WP</span>
+                          )}
+                        </td>
                         <td className="px-4 py-2">
                           <input
                             type="checkbox"
