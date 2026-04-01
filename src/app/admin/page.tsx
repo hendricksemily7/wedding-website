@@ -13,6 +13,7 @@ interface RSVP {
   mealChoice?: string;
   dietaryNotes?: string;
   needsShuttle: boolean;
+  attendingRehearsalDinner?: boolean;
   comments?: string;
   respondedAt: string;
 }
@@ -71,6 +72,10 @@ export default function AdminPage() {
 
   // Search
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter
+  type FilterType = "all" | "weddingParty" | "responded" | "attending" | "notAttending" | "needsShuttle" | "noResponse";
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 
   const fetchParties = async () => {
     try {
@@ -338,23 +343,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleToggleWeddingParty = async (guestId: string, currentValue: boolean) => {
-    try {
-      const res = await fetch(`/api/admin/guests/${guestId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "guestDetails",
-          isWeddingParty: !currentValue,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to update");
-      await fetchParties();
-    } catch (err) {
-      alert("Failed to update wedding party status");
-    }
-  };
-
   const getMealName = (choice?: string) => {
     const meals: Record<string, string> = {
       CHICKEN: "Lemon Chicken",
@@ -369,22 +357,38 @@ export default function AdminPage() {
   const totalGuests = parties.reduce((sum, p) => sum + p.guests.length, 0);
   const weddingPartyGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.isWeddingParty).length, 0);
   const respondedGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp).length, 0);
+  const noResponseGuests = totalGuests - respondedGuests;
   const attendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.attending).length, 0);
   const notAttendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp && !g.rsvp.attending).length, 0);
   const needsShuttleGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.needsShuttle).length, 0);
 
-  // Filter parties based on search query
-  const filteredParties = searchQuery.trim()
-    ? parties.map(party => ({
-        ...party,
-        guests: party.guests.filter(guest => 
-          guest.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      })).filter(party => 
-        party.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        party.guests.length > 0
-      )
-    : parties;
+  // Apply filter function to guests
+  const applyFilter = (guest: Guest): boolean => {
+    switch (activeFilter) {
+      case "weddingParty": return guest.isWeddingParty;
+      case "responded": return !!guest.rsvp;
+      case "noResponse": return !guest.rsvp;
+      case "attending": return !!guest.rsvp?.attending;
+      case "notAttending": return !!guest.rsvp && !guest.rsvp.attending;
+      case "needsShuttle": return !!guest.rsvp?.needsShuttle;
+      default: return true;
+    }
+  };
+
+  // Filter parties based on search query and active filter
+  const filteredParties = parties
+    .map(party => ({
+      ...party,
+      guests: party.guests.filter(guest => {
+        const matchesSearch = !searchQuery.trim() || 
+          guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          party.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = applyFilter(guest);
+        return matchesSearch && matchesFilter;
+      })
+    }))
+    .filter(party => party.guests.length > 0 || 
+      (!searchQuery.trim() && activeFilter === "all" && party.name.toLowerCase().includes(searchQuery.toLowerCase())));
 
   // Show loading while checking auth
   if (checkingAuth) {
@@ -453,35 +457,77 @@ export default function AdminPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
-        <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
+        <button
+          onClick={() => setActiveFilter("all")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "all" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}
+        >
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalParties}</p>
           <p className="text-sm text-gray-600">Parties</p>
-        </div>
-        <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter("all")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "all" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}
+        >
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalGuests}</p>
           <p className="text-sm text-gray-600">Total Guests</p>
-        </div>
-        <div className="bg-purple-50 rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter(activeFilter === "weddingParty" ? "all" : "weddingParty")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "weddingParty" ? "ring-2 ring-purple-500 bg-purple-100" : "bg-purple-50 hover:bg-purple-100"}`}
+        >
           <p className="text-2xl font-bold text-purple-700">{weddingPartyGuests}</p>
           <p className="text-sm text-gray-600">Wedding Party</p>
-        </div>
-        <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter(activeFilter === "responded" ? "all" : "responded")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "responded" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}
+        >
           <p className="text-2xl font-bold text-[#2D4D3A]">{respondedGuests}</p>
           <p className="text-sm text-gray-600">Responded</p>
-        </div>
-        <div className="bg-green-50 rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter(activeFilter === "attending" ? "all" : "attending")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "attending" ? "ring-2 ring-green-500 bg-green-100" : "bg-green-50 hover:bg-green-100"}`}
+        >
           <p className="text-2xl font-bold text-green-700">{attendingGuests}</p>
           <p className="text-sm text-gray-600">Attending</p>
-        </div>
-        <div className="bg-red-50 rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter(activeFilter === "notAttending" ? "all" : "notAttending")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "notAttending" ? "ring-2 ring-red-500 bg-red-100" : "bg-red-50 hover:bg-red-100"}`}
+        >
           <p className="text-2xl font-bold text-red-700">{notAttendingGuests}</p>
           <p className="text-sm text-gray-600">Not Attending</p>
-        </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
+        </button>
+        <button
+          onClick={() => setActiveFilter(activeFilter === "needsShuttle" ? "all" : "needsShuttle")}
+          className={`rounded-lg p-4 text-center transition ${activeFilter === "needsShuttle" ? "ring-2 ring-blue-500 bg-blue-100" : "bg-blue-50 hover:bg-blue-100"}`}
+        >
           <p className="text-2xl font-bold text-blue-700">{needsShuttleGuests}</p>
           <p className="text-sm text-gray-600">Need Shuttle</p>
-        </div>
+        </button>
       </div>
+
+      {/* Active Filter Indicator */}
+      {activeFilter !== "all" && (
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-sm text-gray-600">Filtered by:</span>
+          <span className="px-2 py-1 bg-gray-100 rounded text-sm font-medium">
+            {activeFilter === "weddingParty" && "Wedding Party"}
+            {activeFilter === "responded" && "Responded"}
+            {activeFilter === "noResponse" && "No Response"}
+            {activeFilter === "attending" && "Attending"}
+            {activeFilter === "notAttending" && "Not Attending"}
+            {activeFilter === "needsShuttle" && "Needs Shuttle"}
+          </span>
+          <button
+            onClick={() => setActiveFilter("all")}
+            className="text-sm text-gray-500 hover:text-gray-700 underline"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
       {/* Add Party Form */}
       <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
@@ -570,7 +616,7 @@ export default function AdminPage() {
                 placeholder="Search guests or parties..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
+                className="w-full border border-gray-300 rounded-md px-4 py-2 bg-white focus:outline-none focus:border-[#2D4D3A]"
               />
             </div>
             <button
@@ -667,10 +713,10 @@ export default function AdminPage() {
               <thead className="bg-gray-50 text-sm">
                 <tr>
                   <th className="px-4 py-2 font-medium text-gray-600">Guest Name</th>
-                  <th className="px-4 py-2 font-medium text-gray-600">Wedding Party</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Status</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Meal</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Shuttle</th>
+                  <th className="px-4 py-2 font-medium text-gray-600">Rehearsal</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Notes</th>
                   <th className="px-4 py-2 font-medium text-gray-600">Actions</th>
                 </tr>
@@ -690,14 +736,6 @@ export default function AdminPage() {
                           {guest.isWeddingParty && (
                             <span className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">WP</span>
                           )}
-                        </td>
-                        <td className="px-4 py-2">
-                          <input
-                            type="checkbox"
-                            checked={guest.isWeddingParty}
-                            onChange={() => handleToggleWeddingParty(guest.id, guest.isWeddingParty)}
-                            className="accent-[#2D4D3A]"
-                          />
                         </td>
                         <td className="px-4 py-2">
                           <select
@@ -737,6 +775,9 @@ export default function AdminPage() {
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
+                        <td className="px-4 py-2 text-gray-600">
+                          {guest.isWeddingParty ? (guest.rsvp?.attendingRehearsalDinner ? "Yes" : guest.rsvp?.attendingRehearsalDinner === false ? "No" : "-") : "-"}
+                        </td>
                         <td className="px-4 py-2">
                           <input
                             type="text"
@@ -770,15 +811,6 @@ export default function AdminPage() {
                           )}
                         </td>
                         <td className="px-4 py-2">
-                          <input
-                            type="checkbox"
-                            checked={guest.isWeddingParty}
-                            onChange={() => handleToggleWeddingParty(guest.id, guest.isWeddingParty)}
-                            className="accent-[#2D4D3A] cursor-pointer"
-                            title={guest.isWeddingParty ? "In wedding party" : "Not in wedding party"}
-                          />
-                        </td>
-                        <td className="px-4 py-2">
                           {guest.rsvp ? (
                             <span
                               className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -797,6 +829,9 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-2 text-gray-600 text-sm">{getMealName(guest.rsvp?.mealChoice)}</td>
                         <td className="px-4 py-2 text-gray-600">{guest.rsvp?.needsShuttle ? "Yes" : "-"}</td>
+                        <td className="px-4 py-2 text-gray-600">
+                          {guest.isWeddingParty ? (guest.rsvp?.attendingRehearsalDinner ? "Yes" : guest.rsvp?.attendingRehearsalDinner === false ? "No" : "-") : "-"}
+                        </td>
                         <td className="px-4 py-2 text-gray-600 text-sm max-w-[150px] truncate">
                           {guest.rsvp?.dietaryNotes || guest.rsvp?.comments || "-"}
                         </td>
@@ -835,9 +870,13 @@ export default function AdminPage() {
           </div>
         )}
         
-        {parties.length > 0 && filteredParties.length === 0 && searchQuery && (
+        {parties.length > 0 && filteredParties.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
-            No guests or parties match &quot;{searchQuery}&quot;
+            {searchQuery && activeFilter !== "all" 
+              ? `No guests match "${searchQuery}" with the current filter`
+              : searchQuery 
+                ? `No guests or parties match "${searchQuery}"`
+                : "No guests match the current filter"}
           </div>
         )}
       </div>
