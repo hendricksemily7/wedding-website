@@ -62,11 +62,15 @@ export default function AdminPage() {
   // Editing guest RSVP
   const [editingRsvpGuestId, setEditingRsvpGuestId] = useState<string | null>(null);
   const [editRsvpForm, setEditRsvpForm] = useState({
+    name: "",
     attending: true,
     mealChoice: "",
     dietaryNotes: "",
     needsShuttle: false,
   });
+
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchParties = async () => {
     try {
@@ -291,6 +295,7 @@ export default function AdminPage() {
   const startEditingRsvp = (guest: Guest) => {
     setEditingRsvpGuestId(guest.id);
     setEditRsvpForm({
+      name: guest.name,
       attending: guest.rsvp?.attending ?? true,
       mealChoice: guest.rsvp?.mealChoice || "",
       dietaryNotes: guest.rsvp?.dietaryNotes || "",
@@ -298,8 +303,22 @@ export default function AdminPage() {
     });
   };
 
-  const handleUpdateRsvp = async (guestId: string) => {
+  const handleUpdateRsvp = async (guestId: string, originalName: string) => {
     try {
+      // Update guest name if changed
+      if (editRsvpForm.name && editRsvpForm.name !== originalName) {
+        const nameRes = await fetch(`/api/admin/guests/${guestId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "guestDetails",
+            name: editRsvpForm.name,
+          }),
+        });
+        if (!nameRes.ok) throw new Error("Failed to update guest name");
+      }
+
+      // Update RSVP
       const res = await fetch(`/api/admin/guests/${guestId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -315,7 +334,7 @@ export default function AdminPage() {
       setEditingRsvpGuestId(null);
       await fetchParties();
     } catch (err) {
-      alert("Failed to update RSVP");
+      alert("Failed to update");
     }
   };
 
@@ -353,6 +372,19 @@ export default function AdminPage() {
   const attendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.attending).length, 0);
   const notAttendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp && !g.rsvp.attending).length, 0);
   const needsShuttleGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.needsShuttle).length, 0);
+
+  // Filter parties based on search query
+  const filteredParties = searchQuery.trim()
+    ? parties.map(party => ({
+        ...party,
+        guests: party.guests.filter(guest => 
+          guest.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })).filter(party => 
+        party.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        party.guests.length > 0
+      )
+    : parties;
 
   // Show loading while checking auth
   if (checkingAuth) {
@@ -531,7 +563,16 @@ export default function AdminPage() {
       {/* Party List */}
       <div className="space-y-4">
         {totalParties > 0 && (
-          <div className="flex justify-end mb-2">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+            <div className="flex-1 min-w-[200px] max-w-md">
+              <input
+                type="text"
+                placeholder="Search guests or parties..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
+              />
+            </div>
             <button
               onClick={handleDeleteAllParties}
               className="text-sm text-red-600 hover:text-red-800 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
@@ -540,7 +581,7 @@ export default function AdminPage() {
             </button>
           </div>
         )}
-        {parties.map((party) => (
+        {filteredParties.map((party) => (
           <div key={party.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             {/* Party Header */}
             <div className="bg-[#f5f7f6] px-4 py-3 flex flex-wrap items-center justify-between gap-2">
@@ -639,8 +680,13 @@ export default function AdminPage() {
                   <tr key={guest.id} className="border-t border-gray-100 hover:bg-gray-50">
                     {editingRsvpGuestId === guest.id ? (
                       <>
-                        <td className="px-4 py-2 font-medium">
-                          {guest.name}
+                        <td className="px-4 py-2">
+                          <input
+                            type="text"
+                            value={editRsvpForm.name}
+                            onChange={(e) => setEditRsvpForm({ ...editRsvpForm, name: e.target.value })}
+                            className="border border-gray-300 rounded px-2 py-1 text-sm font-medium w-full max-w-[150px]"
+                          />
                           {guest.isWeddingParty && (
                             <span className="ml-2 px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">WP</span>
                           )}
@@ -702,7 +748,7 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-2">
                           <button
-                            onClick={() => handleUpdateRsvp(guest.id)}
+                            onClick={() => handleUpdateRsvp(guest.id, guest.name)}
                             className="text-green-600 hover:text-green-800 text-sm mr-2"
                           >
                             Save
@@ -759,7 +805,7 @@ export default function AdminPage() {
                             onClick={() => startEditingRsvp(guest)}
                             className="text-blue-600 hover:text-blue-800 text-sm mr-2"
                           >
-                            Edit RSVP
+                            Edit
                           </button>
                           <button
                             onClick={() => handleDeleteGuest(guest.id, guest.name, party.id)}
@@ -780,6 +826,12 @@ export default function AdminPage() {
         {parties.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
             No parties yet. Add your first party above!
+          </div>
+        )}
+        
+        {parties.length > 0 && filteredParties.length === 0 && searchQuery && (
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+            No guests or parties match &quot;{searchQuery}&quot;
           </div>
         )}
       </div>
