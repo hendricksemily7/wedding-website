@@ -73,6 +73,9 @@ export default function AdminPage() {
   // Search
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Add Party Modal
+  const [showAddModal, setShowAddModal] = useState(false);
+
   // Filter
   type FilterType = "all" | "weddingParty" | "responded" | "attending" | "notAttending" | "needsShuttle" | "noResponse";
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
@@ -529,82 +532,106 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Add Party Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold text-[#2D4D3A] mb-4">Add Party</h2>
-        <form onSubmit={handleAddParty} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Party Name (e.g., 'The Smith Family') *"
-            value={newParty.name}
-            onChange={(e) => setNewParty({ ...newParty, name: e.target.value })}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
-            required
-          />
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Guest Names</label>
-            {newParty.guestNames.map((name, index) => (
-              <div key={index} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder={`Guest ${index + 1} name`}
-                  value={name}
-                  onChange={(e) => {
-                    const updated = [...newParty.guestNames];
-                    updated[index] = e.target.value;
-                    setNewParty({ ...newParty, guestNames: updated });
-                  }}
-                  className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
-                />
-                {newParty.guestNames.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = newParty.guestNames.filter((_, i) => i !== index);
-                      setNewParty({ ...newParty, guestNames: updated });
-                    }}
-                    className="text-red-600 hover:text-red-800 px-2"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setNewParty({ ...newParty, guestNames: [...newParty.guestNames, ""] })}
-              className="text-sm text-[#2D4D3A] hover:underline"
-            >
-              + Add another guest
-            </button>
-          </div>
-          
-          <button
-            type="submit"
-            disabled={addingParty}
-            className="bg-[#2D4D3A] text-white px-6 py-2 rounded-md hover:bg-[#1f3528] transition disabled:opacity-50"
-          >
-            {addingParty ? "Adding..." : "Add Party"}
-          </button>
-        </form>
+      {/* Add Party Button */}
+      <button
+        onClick={() => setShowAddModal(true)}
+        className="mb-6 bg-[#2D4D3A] text-white px-4 py-2 rounded-md hover:bg-[#1f3528] transition flex items-center gap-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        Add Party
+      </button>
 
-        {/* CSV Upload */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          {/* <p className="text-sm text-gray-600 mb-2">
-            Or upload a CSV file (columns: partyName, guestNames, weddingParty). Guest names and wedding party flags are semicolon-separated. Use &quot;yes/true/1&quot; for wedding party (e.g., &quot;yes;no&quot;) or add * after a name.
-          </p> */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            onChange={handleCSVUpload}
-            disabled={uploading}
-            className="text-sm"
-          />
-          {uploading && <span className="ml-2 text-sm text-gray-500">Uploading...</span>}
+      {/* Add Party Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-[#2D4D3A]">Add Party</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={(e) => { handleAddParty(e); setShowAddModal(false); }} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Party Name (e.g., 'The Smith Family') *"
+                value={newParty.name}
+                onChange={(e) => setNewParty({ ...newParty, name: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
+                required
+              />
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Guest Names</label>
+                {newParty.guestNames.map((name, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder={`Guest ${index + 1} name`}
+                      value={name}
+                      onChange={(e) => {
+                        const updated = [...newParty.guestNames];
+                        updated[index] = e.target.value;
+                        setNewParty({ ...newParty, guestNames: updated });
+                      }}
+                      className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
+                    />
+                    {newParty.guestNames.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = newParty.guestNames.filter((_, i) => i !== index);
+                          setNewParty({ ...newParty, guestNames: updated });
+                        }}
+                        className="text-red-600 hover:text-red-800 px-2"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setNewParty({ ...newParty, guestNames: [...newParty.guestNames, ""] })}
+                  className="text-sm text-[#2D4D3A] hover:underline"
+                >
+                  + Add another guest
+                </button>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={addingParty}
+                className="w-full bg-[#2D4D3A] text-white px-6 py-2 rounded-md hover:bg-[#1f3528] transition disabled:opacity-50"
+              >
+                {addingParty ? "Adding..." : "Add Party"}
+              </button>
+            </form>
+
+            {/* CSV Upload */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <p className="text-sm text-gray-600 mb-2">Or upload a CSV file:</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={(e) => { handleCSVUpload(e); setShowAddModal(false); }}
+                disabled={uploading}
+                className="text-sm"
+              />
+              {uploading && <span className="ml-2 text-sm text-gray-500">Uploading...</span>}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Party List */}
       <div className="space-y-4">
