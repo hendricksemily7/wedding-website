@@ -348,6 +348,7 @@ export default function AdminPage() {
   // Stats
   const totalParties = parties.length;
   const totalGuests = parties.reduce((sum, p) => sum + p.guests.length, 0);
+  const weddingPartyGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.isWeddingParty).length, 0);
   const respondedGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp).length, 0);
   const attendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp?.attending).length, 0);
   const notAttendingGuests = parties.reduce((sum, p) => sum + p.guests.filter(g => g.rsvp && !g.rsvp.attending).length, 0);
@@ -416,18 +417,10 @@ export default function AdminPage() {
         <h1 className={`${playfair.className} text-3xl md:text-4xl font-medium text-[#2D4D3A] text-center`}>
           Guest Admin
         </h1>
-        {totalParties > 0 && (
-          <button
-            onClick={handleDeleteAllParties}
-            className="text-sm text-red-600 hover:text-red-800 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
-          >
-            Delete All ({totalGuests} guests)
-          </button>
-        )}
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
         <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalParties}</p>
           <p className="text-sm text-gray-600">Parties</p>
@@ -435,6 +428,10 @@ export default function AdminPage() {
         <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalGuests}</p>
           <p className="text-sm text-gray-600">Total Guests</p>
+        </div>
+        <div className="bg-purple-50 rounded-lg p-4 text-center">
+          <p className="text-2xl font-bold text-purple-700">{weddingPartyGuests}</p>
+          <p className="text-sm text-gray-600">Wedding Party</p>
         </div>
         <div className="bg-[#f5f7f6] rounded-lg p-4 text-center">
           <p className="text-2xl font-bold text-[#2D4D3A]">{respondedGuests}</p>
@@ -533,6 +530,16 @@ export default function AdminPage() {
 
       {/* Party List */}
       <div className="space-y-4">
+        {totalParties > 0 && (
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={handleDeleteAllParties}
+              className="text-sm text-red-600 hover:text-red-800 border border-red-300 px-3 py-1 rounded hover:bg-red-50 transition"
+            >
+              Delete All ({totalGuests} guests)
+            </button>
+          </div>
+        )}
         {parties.map((party) => (
           <div key={party.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             {/* Party Header */}
