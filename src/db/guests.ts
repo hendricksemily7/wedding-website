@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { MealChoice } from '@/generated/prisma/client';
-import Fuse from 'fuse.js';
+import Fuse, { FuseResult } from 'fuse.js';
 
 // ============ Utility Functions ============
 
@@ -46,6 +46,31 @@ export type PartySearchResult = {
   matchedName: string;
 };
 
+// Generate name variations by swapping order around "and" or "&"
+// e.g., "Joe and Heather O'Brien" -> ["Joe and Heather O'Brien", "Heather and Joe O'Brien"]
+function generateNameVariations(name: string): string[] {
+  const variations = [name];
+  
+  // Match patterns like "Name1 and Name2" or "Name1 & Name2" with optional last name
+  const andMatch = name.match(/^(.+?)\s+(and|&)\s+(.+)$/i);
+  if (andMatch) {
+    const [, firstPart, connector, secondPart] = andMatch;
+    // Swap the order: "Joe and Heather O'Brien" -> "Heather and Joe O'Brien"
+    variations.push(`${secondPart} ${connector} ${firstPart}`);
+    
+    // Also try swapping just first names if there's a shared last name
+    // e.g., "Joe and Heather O'Brien" -> detect "Heather O'Brien" has last name
+    const lastNameMatch = secondPart.match(/^(\w+)\s+(.+)$/);
+    if (lastNameMatch && !firstPart.includes(' ')) {
+      const [, secondFirstName, lastName] = lastNameMatch;
+      // "Heather and Joe O'Brien"
+      variations.push(`${secondFirstName} ${connector} ${firstPart} ${lastName}`);
+    }
+  }
+  
+  return variations;
+}
+
 export async function fuzzySearchParties(searchTerm: string, limit = 5): Promise<PartySearchResult[]> {
   const parties = await getAllParties();
   
@@ -84,13 +109,23 @@ export async function fuzzySearchParties(searchTerm: string, limit = 5): Promise
     minMatchCharLength: 2,
   });
   
-  const results = fuse.search(searchTerm);
+  // Generate variations of the search term (including swapped name order)
+  const searchVariations = generateNameVariations(searchTerm);
+  
+  // Search with all variations and collect results
+  const allResults: FuseResult<SearchItem>[] = [];
+  for (const variation of searchVariations) {
+    allResults.push(...fuse.search(variation));
+  }
+  
+  // Sort by score (lower is better)
+  allResults.sort((a, b) => (a.score ?? 1) - (b.score ?? 1));
   
   // Deduplicate by party ID (keep the best match for each party)
   const seenPartyIds = new Set<string>();
   const uniqueResults: PartySearchResult[] = [];
   
-  for (const result of results) {
+  for (const result of allResults) {
     if (!seenPartyIds.has(result.item.party.id)) {
       seenPartyIds.add(result.item.party.id);
       uniqueResults.push({
