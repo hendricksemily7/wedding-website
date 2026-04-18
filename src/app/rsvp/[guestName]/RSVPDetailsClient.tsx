@@ -39,6 +39,13 @@ interface Party {
   guests: Guest[];
 }
 
+interface Suggestion {
+  name: string;
+  slug: string;
+  matchedOn: 'party' | 'guest';
+  matchedName: string;
+}
+
 interface RSVPDetailsClientProps {
   guestName: string;
 }
@@ -48,6 +55,7 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
   const [party, setParty] = useState<Party | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const displayName = guestName
     .split("-")
@@ -58,16 +66,23 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
     async function fetchParty() {
       try {
         const res = await fetch(`/api/rsvp/${encodeURIComponent(guestName)}`);
+        const data = await res.json();
+        
         if (!res.ok) {
           if (res.status === 404) {
-            setError("Sorry, the name you entered was not found. Please check your invitation and try again.");
+            // Check if there are suggestions from fuzzy search
+            if (data.suggestions && data.suggestions.length > 0) {
+              setSuggestions(data.suggestions);
+              setError("We couldn't find an exact match. Did you mean one of these?");
+            } else {
+              setError("Sorry, the name you entered was not found. Please check your invitation and try again.");
+            }
           } else {
             setError("Failed to load reservation");
           }
           return;
         }
         
-        const data = await res.json();
         setParty(data.party);
       } catch (err) {
         setError("Failed to load reservation");
@@ -101,7 +116,33 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
     return (
       <div className="flex items-center justify-center w-full px-2 py-8">
         <div className="bg-white shadow-md rounded-lg w-full max-w-2xl p-6 md:p-10">
-          <p className="text-center">{error}</p>
+          <p className="text-center text-[#2D4D3A] mb-4">{error}</p>
+          
+          {suggestions.length > 0 && (
+            <div className="space-y-3">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={suggestion.slug}
+                  onClick={() => router.push(`/rsvp/${suggestion.slug}`)}
+                  className="w-full text-left p-4 border border-[#2D4D3A] rounded-lg hover:bg-[#f5f7f6] transition"
+                >
+                  <div className="font-medium text-[#2D4D3A]">{suggestion.name}</div>
+                  {suggestion.matchedOn === 'guest' && suggestion.matchedName !== suggestion.name && (
+                    <div className="text-sm text-gray-500 mt-1">
+                      Includes: {suggestion.matchedName}
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+          
+          <button
+            onClick={() => router.push('/rsvp')}
+            className="mt-6 w-full bg-transparent border border-[#2D4D3A] text-[#2D4D3A] px-6 py-3 rounded-md font-medium tracking-wide hover:bg-[#95a6a0] transition"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );

@@ -48,7 +48,7 @@ export default function Page() {
             In August 2024, we started off the month by getting engaged at Rocky Mountain National Park, and by 8/24/24 we closed on a beautiful house together in Fairfax, VT.
           </p>
           <p>
-            We currently enjoy our daily life together waking up with our mini golden doodle Sophie, our golden retriever Theo, going on bike rides and hikes, the farmers market, breweries, concerts.. Cooking meals, enjoying the sunsets of Mount Mansfield. We couldn’t be happier.
+            We currently enjoy our daily life together waking up with our mini golden doodle Sophie, our golden retriever Theo, going on bike rides and hikes, the farmers market, breweries, concerts, cooking meals, and enjoying the views of Mount Mansfield. We couldn’t be happier.
           </p>
         </div>
       </div>

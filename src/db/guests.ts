@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { MealChoice } from '@/generated/prisma/client';
+import Fuse from 'fuse.js';
 
 // ============ Utility Functions ============
 
@@ -36,6 +37,73 @@ export async function getPartyBySlug(slug: string) {
       },
     },
   });
+}
+
+export type PartySearchResult = {
+  party: Awaited<ReturnType<typeof getAllParties>>[number];
+  score: number;
+  matchedOn: 'party' | 'guest';
+  matchedName: string;
+};
+
+export async function fuzzySearchParties(searchTerm: string, limit = 5): Promise<PartySearchResult[]> {
+  const parties = await getAllParties();
+  
+  // Create search items that include both party names and individual guest names
+  type SearchItem = {
+    party: typeof parties[number];
+    searchName: string;
+    type: 'party' | 'guest';
+  };
+  
+  const searchItems: SearchItem[] = [];
+  
+  for (const party of parties) {
+    // Add party name as searchable
+    searchItems.push({
+      party,
+      searchName: party.name,
+      type: 'party',
+    });
+    
+    // Add each guest name as searchable (links back to their party)
+    for (const guest of party.guests) {
+      searchItems.push({
+        party,
+        searchName: guest.name,
+        type: 'guest',
+      });
+    }
+  }
+  
+  const fuse = new Fuse(searchItems, {
+    keys: ['searchName'],
+    threshold: 0.4, // 0 = perfect match, 1 = match anything. 0.4 is fairly loose
+    includeScore: true,
+    ignoreLocation: true, // Match anywhere in the string
+    minMatchCharLength: 2,
+  });
+  
+  const results = fuse.search(searchTerm);
+  
+  // Deduplicate by party ID (keep the best match for each party)
+  const seenPartyIds = new Set<string>();
+  const uniqueResults: PartySearchResult[] = [];
+  
+  for (const result of results) {
+    if (!seenPartyIds.has(result.item.party.id)) {
+      seenPartyIds.add(result.item.party.id);
+      uniqueResults.push({
+        party: result.item.party,
+        score: result.score ?? 1,
+        matchedOn: result.item.type,
+        matchedName: result.item.searchName,
+      });
+    }
+    if (uniqueResults.length >= limit) break;
+  }
+  
+  return uniqueResults;
 }
 
 export async function getPartyById(id: string) {
