@@ -30,17 +30,17 @@ const SharedHeader: React.FC<HeaderProps> = ({
   return (
     <header className="">
       {/* Top info section */}
-      <div className="flex flex-col items-center pb-5">
-        <h1 className={`${playfair.className} text-2xl md:text-4xl text-center`}>
+      <div className="flex flex-col items-center pb-4 px-4">
+        <h1 className={`${playfair.className} text-3xl md:text-4xl text-center`}>
           {coupleNames}
         </h1>
         <p
-          className={`${playfair.className} text-xl md:text-base text-center`}
+          className={`${playfair.className} text-sm md:text-base text-center tracking-wide`}
         >
           {eventDetails}
         </p>
         <p
-          className={`${playfair.className} text-xl md:text-base text-center`}
+          className={`${playfair.className} text-sm md:text-base text-center tracking-wide`}
         >
           {countdown}
         </p>
@@ -49,7 +49,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
       {/* Navigation */}
       <nav className="bg-[#95a6a0]">
         {/* Mobile toggle button */}
-        <div className={`${playfair.className} flex justify-between items-center px-6 pt-10 md:hidden text-xl`}>
+        <div className={`${playfair.className} mx-auto flex w-full max-w-5xl justify-between items-center px-4 pt-4 pb-2 md:hidden text-base`}>
           <span className="font-semibold text-md">
             {!isOpen ? menuLabel.toUpperCase() : ''}
           </span>
@@ -65,10 +65,10 @@ const SharedHeader: React.FC<HeaderProps> = ({
 
         {/* Links */}
         <ul
-          className={`${playfair.className} 
-            flex flex-wrap justify-center gap-4 px-6 pt-10 text-xl
-            md:flex-row md:items-center md:justify-center
-            ${isOpen ? 'flex flex-col' : 'hidden'} md:flex
+          className={`${playfair.className}
+            mx-auto w-full max-w-5xl text-lg
+            md:flex md:flex-row md:items-center md:justify-center md:gap-4 md:px-6 md:pt-6
+            ${isOpen ? 'flex flex-col items-center gap-2 px-4 pb-4' : 'hidden'}
           `}
         >
           {navLinksList.map((link) => {

@@ -55,7 +55,7 @@ export default function RootLayout({
           - pb-4: slightly smaller bottom padding so footer isn't flush against edge
           - gap-16: spacing between main content and footer
         */}
-          <div className="grid min-h-screen grid-rows-[1fr_auto] p-10 pb-4 bg-[#95a6a0]">
+          <div className="grid min-h-screen grid-rows-[1fr_auto] bg-[#95a6a0] px-4 pt-4 pb-4 sm:px-6 md:p-10 md:pb-4">
           
           {/*
             main:
@@ -64,7 +64,7 @@ export default function RootLayout({
             - items-center: center-aligns children horizontally on mobile
             - sm:items-start: switch to left-alignment on larger screens
           */}
-          <main className="row-start-1 flex flex-col items-center sm:items-start">
+          <main className="row-start-1 flex flex-col items-center">
             
             {/*
               max-width content wrapper:

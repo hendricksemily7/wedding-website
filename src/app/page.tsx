@@ -20,33 +20,33 @@ const schedule = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <Image
         src="/home3.jpg"
         alt="Wedding photo"
         width={1920}
         height={1080}
         priority
-        className="w-2/3 h-auto rounded-lg"
+        className="w-full max-w-[720px] h-auto rounded-lg"
       />
 
       {/* Schedule Section */}
-      <div className={`${playfair.className} w-full max-w-2xl mx-auto px-6 mt-16 mb-12`}>
+      <div className={`${playfair.className} w-full max-w-2xl mx-auto px-2 sm:px-4 md:px-6 mt-10 md:mt-16 mb-10 md:mb-12`}>
         <h2
-          className="text-2xl md:text-3xl text-center mb-10"
+          className="text-2xl md:text-3xl text-center mb-8 md:mb-10"
         >
           Schedule of Events
         </h2>
 
         <div className="flex flex-col items-center">
-          <div className="space-y-4">
+          <div className="space-y-5 w-full">
             {schedule.map((item, index) => (
-              <div key={index} className="flex items-center">
-                <span className="w-24 md:w-28 text-right text-sm md:text-base text-gray-600 font-medium">
+              <div key={index} className="flex flex-col md:flex-row md:items-center md:justify-center gap-1 md:gap-0 text-center md:text-left">
+                <span className="md:w-28 md:text-right text-sm md:text-base text-gray-700 font-medium">
                   {item.time}
                 </span>
-                <span className="mx-6 text-gray-600 tracking-[0.4em]">· · · · · · · · ·</span>
-                <span className="w-36 md:w-44 text-left text-base md:text-lg">{item.event}</span>
+                <span className="hidden md:inline mx-6 text-gray-600 tracking-[0.4em]">· · · · · · · · ·</span>
+                <span className="text-base md:text-lg md:w-44 md:text-left">{item.event}</span>
               </div>
             ))}
           </div>

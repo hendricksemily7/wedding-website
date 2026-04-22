@@ -17,7 +17,7 @@ export default function Page() {
       {/* Image */}
       <div className="relative w-full h-80 md:h-[500px] mb-6">
         <Image
-          src="/InnAtGrace1.jpg"
+          src="/Inn at Grace Farm Landscape.png"
           alt="Wedding Venue"
           fill
           className="object-cover rounded-2xl shadow-lg"
