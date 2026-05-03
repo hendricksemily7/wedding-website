@@ -1,7 +1,9 @@
 // src/app/page.tsx
 import Image from "next/image";
+import Link from "next/link";
 import { Playfair_Display } from 'next/font/google';
-import { FaMapPin } from 'react-icons/fa'; // Example from Font Awesome
+import { FaMapPin } from 'react-icons/fa';
+import { FiGlobe } from 'react-icons/fi';
 
 const playfair = Playfair_Display({
   weight: '400',
@@ -12,7 +14,16 @@ export default function Page() {
   return (
     <div className="w-full max-w-5xl mx-auto px-6 text-center">
       {/* Title */}
-      <h1 className={`${playfair.className} text-2xl md:text-3xl font-bold mb-6`}>The Inn at Grace Farm</h1>
+      <h1 className={`${playfair.className} text-2xl md:text-3xl font-bold mb-6`}>
+        <Link
+          href="https://www.innatgracefarm.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          The Inn at Grace Farm
+        </Link>
+      </h1>
 
       {/* Image */}
       <div className="relative w-full h-80 md:h-[500px] mb-6">
@@ -32,6 +43,16 @@ export default function Page() {
       <p className="text-xl text-gray-700">
         We can’t wait to celebrate this special day with you surrounded by nature and love.
       </p>
+
+          <div className="flex justify-center items-center gap-2 mt-6 text-gray-700">
+      {/* <BsBrowserChrome size={30} /> */}
+       <FiGlobe size={20}  />
+          <Link href="https://www.innatgracefarm.com/" target="_blank" rel="noopener noreferrer" className="text-black-600 hover:underline">
+        <span className="text-gray-700">View the Venue's website</span>
+          </Link>
+      </div>
+
+
       <div className="flex justify-center items-center gap-2 mt-6 text-gray-700">
         <FaMapPin className="text-black-600 text-lg" />
         <span className="text-gray-700">117 Highbridge Rd, Fairfax, VT 05454</span>

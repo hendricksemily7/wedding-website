@@ -7,7 +7,7 @@ export const weddingNavLinksList = [
     { label: 'Our Story', href: '/our-story', target: '' },
     { label: 'Accommodations', href: '/accommodations', target: '' },
     { label: 'Venue', href: '/venue', target: '' },
-    { label: 'Registry', href: 'https://registry.theknot.com/-december-2026-vt/75002398', target: 'blank' },
+    { label: 'Registry', href: 'https://registry.theknot.com/-december-2026-vt/75002398', target: '_blank' },
     { label: 'RSVP', href: '/rsvp', target: '' },
     { label: 'Q&A', href: '/qa', target: '' },
   ];

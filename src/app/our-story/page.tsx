@@ -45,7 +45,7 @@ export default function Page() {
             We knew we were a perfect match. Jess took a job in Colorado, and after a year of an unbelievable adventure, she wanted to be where her heart belongs, which is in Vermont with Emily and their families.
           </p>
           <p>
-            In August 2024, we started off the month by getting engaged at Rocky Mountain National Park, and by 8/24/24 we closed on a beautiful house together in Fairfax, VT.
+            In August 2024, we started off the month by getting engaged at Rocky Mountain National Park, and by 8/26/24 we closed on a beautiful house together in Fairfax, VT.
           </p>
           <p>
             We currently enjoy our daily life together waking up with our mini golden doodle Sophie, our golden retriever Theo, going on bike rides and hikes, the farmers market, breweries, concerts, cooking meals, and enjoying the views of Mount Mansfield. We couldn’t be happier.
