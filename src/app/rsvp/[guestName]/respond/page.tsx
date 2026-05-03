@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Playfair_Display } from "next/font/google";
 import { meals } from "../meal/page";
+import { trackRSVPEvent } from "@/lib/rsvpAnalytics";
 
 const playfair = Playfair_Display({
   weight: "400",
@@ -57,6 +58,8 @@ export default function RespondPage() {
   // Current step in the flow
   const [currentGuestIndex, setCurrentGuestIndex] = useState(0);
   const [step, setStep] = useState<"attending" | "meal" | "dietary" | "shuttle" | "rehearsalDinner" | "review">("attending");
+  const flowOpenedTrackedRef = useRef(false);
+  const lastStepTrackedRef = useRef("");
 
   useEffect(() => {
     async function fetchParty() {
@@ -91,6 +94,41 @@ export default function RespondPage() {
     fetchParty();
   }, [guestName]);
 
+  useEffect(() => {
+    if (!party || loading || error || flowOpenedTrackedRef.current) {
+      return;
+    }
+
+    flowOpenedTrackedRef.current = true;
+    void trackRSVPEvent({
+      eventType: "respond_flow_opened",
+      guestSlug: guestName as string,
+      partyId: party.id,
+      totalGuests: party.guests.length,
+    });
+  }, [party, guestName, loading, error]);
+
+  useEffect(() => {
+    if (!party || loading || error) {
+      return;
+    }
+
+    const stepKey = `${party.id}:${currentGuestIndex}:${step}`;
+    if (lastStepTrackedRef.current === stepKey) {
+      return;
+    }
+
+    lastStepTrackedRef.current = stepKey;
+    void trackRSVPEvent({
+      eventType: "respond_step_view",
+      step,
+      guestSlug: guestName as string,
+      partyId: party.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party.guests.length,
+    });
+  }, [party, loading, error, step, currentGuestIndex, guestName]);
+
   const currentGuest = party?.guests[currentGuestIndex];
   const currentResponse = responses[currentGuestIndex];
 
@@ -104,6 +142,15 @@ export default function RespondPage() {
 
   const handleAttendingChoice = (attending: boolean) => {
     updateCurrentResponse({ attending });
+    void trackRSVPEvent({
+      eventType: "attending_selected",
+      step: "attending",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: { attending },
+    });
     
     if (attending) {
       setStep("meal");
@@ -115,15 +162,43 @@ export default function RespondPage() {
 
   const handleMealChoice = (mealChoice: string) => {
     updateCurrentResponse({ mealChoice });
+    void trackRSVPEvent({
+      eventType: "meal_selected",
+      step: "meal",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: { mealChoice },
+    });
     setStep("dietary");
   };
 
   const handleDietaryNext = () => {
+    const notesLength = currentResponse?.dietaryNotes.trim().length ?? 0;
+    void trackRSVPEvent({
+      eventType: "dietary_continue",
+      step: "dietary",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: { notesLength, hasNotes: notesLength > 0 },
+    });
     setStep("shuttle");
   };
 
   const handleShuttleChoice = (needsShuttle: boolean) => {
     updateCurrentResponse({ needsShuttle });
+    void trackRSVPEvent({
+      eventType: "shuttle_selected",
+      step: "shuttle",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: { needsShuttle },
+    });
     // If wedding party member, ask about rehearsal dinner
     if (currentResponse?.isWeddingParty) {
       setStep("rehearsalDinner");
@@ -134,6 +209,39 @@ export default function RespondPage() {
 
   const handleRehearsalDinnerChoice = (attendingRehearsalDinner: boolean) => {
     updateCurrentResponse({ attendingRehearsalDinner });
+    void trackRSVPEvent({
+      eventType: "rehearsal_selected",
+      step: "rehearsalDinner",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: { attendingRehearsalDinner },
+    });
+    moveToNextGuestOrReview();
+  };
+
+  const handleSkipGuest = () => {
+    // Clear any in-progress answers for this guest and move on.
+    updateCurrentResponse({
+      attending: null,
+      mealChoice: null,
+      dietaryNotes: "",
+      needsShuttle: false,
+      attendingRehearsalDinner: null,
+    });
+    void trackRSVPEvent({
+      eventType: "guest_skipped",
+      step: "attending",
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+      metadata: {
+        guestId: currentGuest?.id,
+        guestName: currentGuest?.name,
+      },
+    });
     moveToNextGuestOrReview();
   };
 
@@ -148,13 +256,42 @@ export default function RespondPage() {
 
   const handleSubmit = async () => {
     if (!party) return;
-    
+
+    const answeredResponses = responses.filter(
+      (response): response is GuestResponse & { attending: boolean } => response.attending !== null
+    );
+
+    if (answeredResponses.length === 0) {
+      void trackRSVPEvent({
+        eventType: "submit_blocked_no_answers",
+        step: "review",
+        guestSlug: guestName as string,
+        partyId: party.id,
+        totalGuests: party.guests.length,
+      });
+      alert("Please submit at least one response, or answer one guest before submitting.");
+      return;
+    }
+
+    const skippedCount = responses.length - answeredResponses.length;
+    void trackRSVPEvent({
+      eventType: "submit_attempt",
+      step: "review",
+      guestSlug: guestName as string,
+      partyId: party.id,
+      totalGuests: party.guests.length,
+      metadata: {
+        answeredCount: answeredResponses.length,
+        skippedCount,
+      },
+    });
+
     setSaving(true);
     try {
       // Format responses for the API
-      const rsvps = responses.map(r => ({
+      const rsvps = answeredResponses.map(r => ({
         guestId: r.guestId,
-        attending: r.attending ?? false,
+        attending: r.attending,
         mealChoice: r.attending ? r.mealChoice : undefined,
         dietaryNotes: r.dietaryNotes || undefined,
         needsShuttle: r.attending ? r.needsShuttle : false,
@@ -171,8 +308,27 @@ export default function RespondPage() {
         throw new Error("Failed to save RSVP");
       }
 
+      void trackRSVPEvent({
+        eventType: "submit_success",
+        step: "review",
+        guestSlug: guestName as string,
+        partyId: party.id,
+        totalGuests: party.guests.length,
+        metadata: {
+          answeredCount: answeredResponses.length,
+          skippedCount,
+        },
+      });
+
       router.push(`/rsvp/${guestName}?saved=true`);
     } catch (err) {
+      void trackRSVPEvent({
+        eventType: "submit_failed",
+        step: "review",
+        guestSlug: guestName as string,
+        partyId: party.id,
+        totalGuests: party.guests.length,
+      });
       alert("Failed to save your RSVP. Please try again.");
     } finally {
       setSaving(false);
@@ -180,6 +336,15 @@ export default function RespondPage() {
   };
 
   const goBack = () => {
+    void trackRSVPEvent({
+      eventType: "back_clicked",
+      step,
+      guestSlug: guestName as string,
+      partyId: party?.id,
+      guestIndex: currentGuestIndex,
+      totalGuests: party?.guests.length,
+    });
+
     if (step === "review") {
       // Go back to last guest's last step
       const lastGuestIndex = party ? party.guests.length - 1 : 0;
@@ -256,6 +421,13 @@ export default function RespondPage() {
                 <div key={guest.id} className="bg-[#f5f7f6] rounded-lg p-4">
                   <div className="font-medium text-[#2D4D3A] mb-2">{guest.name}</div>
                   <div className="text-sm space-y-1">
+                    {response?.attending === null ? (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Status</span>
+                        <span className="text-amber-700">Skipped for now</span>
+                      </div>
+                    ) : (
+                      <>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Attending</span>
                       <span className={response?.attending ? "text-green-700" : "text-red-700"}>
@@ -286,6 +458,8 @@ export default function RespondPage() {
                             </span>
                           </div>
                         )}
+                      </>
+                    )}
                       </>
                     )}
                   </div>
@@ -351,6 +525,12 @@ export default function RespondPage() {
                 Sorry, can&apos;t make it
               </button>
             </div>
+            <button
+              onClick={handleSkipGuest}
+              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2"
+            >
+              Skip this person for now
+            </button>
             {currentGuestIndex > 0 && (
               <button
                 onClick={goBack}

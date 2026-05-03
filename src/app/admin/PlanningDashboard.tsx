@@ -134,6 +134,8 @@ export default function PlanningDashboard({ section }: { section: Section }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingVendorId, setEditingVendorId] = useState<string | null>(null);
+  const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [vendorEditForm, setVendorEditForm] = useState({
     name: "",
     category: "OTHER",
@@ -147,6 +149,25 @@ export default function PlanningDashboard({ section }: { section: Section }) {
     driveUrl: "",
     deliverables: "",
     notes: "",
+  });
+  const [expenseEditForm, setExpenseEditForm] = useState({
+    title: "",
+    category: "MISC",
+    amount: "",
+    status: "PENDING",
+    dueDate: "",
+    paidDate: "",
+    vendorId: "",
+    note: "",
+  });
+  const [taskEditForm, setTaskEditForm] = useState({
+    title: "",
+    details: "",
+    status: "TODO",
+    dueDate: "",
+    owner: "BOTH",
+    vendorId: "",
+    partyId: "",
   });
 
   const [vendorForm, setVendorForm] = useState({
@@ -411,6 +432,59 @@ export default function PlanningDashboard({ section }: { section: Section }) {
     await loadPlanningData();
   };
 
+  const startEditingExpense = (expense: Expense) => {
+    setEditingExpenseId(expense.id);
+    setExpenseEditForm({
+      title: expense.title,
+      category: expense.category,
+      amount: String(expense.amount ?? ""),
+      status: expense.status,
+      dueDate: toInputDate(expense.dueDate),
+      paidDate: toInputDate(expense.paidDate),
+      vendorId: expense.vendor?.id ?? "",
+      note: expense.note ?? "",
+    });
+  };
+
+  const cancelEditingExpense = () => {
+    setEditingExpenseId(null);
+    setExpenseEditForm({
+      title: "",
+      category: "MISC",
+      amount: "",
+      status: "PENDING",
+      dueDate: "",
+      paidDate: "",
+      vendorId: "",
+      note: "",
+    });
+  };
+
+  const saveExpenseEdit = async (id: string) => {
+    const response = await fetch(`/api/admin/expenses/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: expenseEditForm.title,
+        category: expenseEditForm.category,
+        amount: expenseEditForm.amount,
+        status: expenseEditForm.status,
+        dueDate: expenseEditForm.dueDate || null,
+        paidDate: expenseEditForm.paidDate || null,
+        vendorId: expenseEditForm.vendorId || null,
+        note: expenseEditForm.note || null,
+      }),
+    });
+
+    if (!response.ok) {
+      alert("Failed to update expense");
+      return;
+    }
+
+    cancelEditingExpense();
+    await loadPlanningData();
+  };
+
   const updateTaskStatus = async (id: string, status: string) => {
     const response = await fetch(`/api/admin/tasks/${id}`, {
       method: "PUT",
@@ -423,6 +497,56 @@ export default function PlanningDashboard({ section }: { section: Section }) {
       return;
     }
 
+    await loadPlanningData();
+  };
+
+  const startEditingTask = (task: Task) => {
+    setEditingTaskId(task.id);
+    setTaskEditForm({
+      title: task.title,
+      details: task.details ?? "",
+      status: task.status,
+      dueDate: toInputDate(task.dueDate),
+      owner: task.owner,
+      vendorId: task.vendor?.id ?? "",
+      partyId: task.party?.id ?? "",
+    });
+  };
+
+  const cancelEditingTask = () => {
+    setEditingTaskId(null);
+    setTaskEditForm({
+      title: "",
+      details: "",
+      status: "TODO",
+      dueDate: "",
+      owner: "BOTH",
+      vendorId: "",
+      partyId: "",
+    });
+  };
+
+  const saveTaskEdit = async (id: string) => {
+    const response = await fetch(`/api/admin/tasks/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: taskEditForm.title,
+        details: taskEditForm.details || null,
+        status: taskEditForm.status,
+        dueDate: taskEditForm.dueDate || null,
+        owner: taskEditForm.owner,
+        vendorId: taskEditForm.vendorId || null,
+        partyId: taskEditForm.partyId || null,
+      }),
+    });
+
+    if (!response.ok) {
+      alert("Failed to update task");
+      return;
+    }
+
+    cancelEditingTask();
     await loadPlanningData();
   };
 
@@ -454,6 +578,8 @@ export default function PlanningDashboard({ section }: { section: Section }) {
     expenses: "Track what is due, what is paid, and which vendor or category each payment belongs to.",
     tasks: "Keep your planning checklist visible with owners, due dates, vendor links, and guest or party context.",
   }[section];
+  const paidExpenseCount = expenses.filter((expense) => expense.status === "PAID").length;
+  const openTaskCount = tasks.filter((task) => task.status !== "DONE").length;
 
   return (
     <section className="mb-10 space-y-6">
@@ -474,24 +600,56 @@ export default function PlanningDashboard({ section }: { section: Section }) {
           </button>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <div className="rounded-xl bg-[#f5f7f6] p-4">
-            <p className="text-2xl font-semibold text-[#2D4D3A]">{vendors.length}</p>
-            <p className="text-sm text-gray-600">Tracked vendors</p>
+        {section === "vendors" ? (
+          <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-[#f5f7f6] p-4">
+              <p className="text-2xl font-semibold text-[#2D4D3A]">{vendors.length}</p>
+              <p className="text-sm text-gray-600">Tracked vendors</p>
+            </div>
+            <div className="rounded-xl bg-[#f1f6ff] p-4">
+              <p className="text-2xl font-semibold text-[#355c98]">{vendorsAwaitingPayment.length}</p>
+              <p className="text-sm text-gray-600">Not fully paid</p>
+            </div>
+            <div className="rounded-xl bg-[#f8f3ea] p-4">
+              <p className="text-2xl font-semibold text-[#7b5b26]">{formatCurrency(vendors.reduce((total, vendor) => total + Number(vendor.contractedAmount ?? 0), 0))}</p>
+              <p className="text-sm text-gray-600">Total contracts</p>
+            </div>
           </div>
-          <div className="rounded-xl bg-[#f8f3ea] p-4">
-            <p className="text-2xl font-semibold text-[#7b5b26]">{formatCurrency(outstandingAmount)}</p>
-            <p className="text-sm text-gray-600">Unpaid expenses</p>
+        ) : null}
+
+        {section === "expenses" ? (
+          <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-[#f5f7f6] p-4">
+              <p className="text-2xl font-semibold text-[#2D4D3A]">{expenses.length}</p>
+              <p className="text-sm text-gray-600">Tracked expenses</p>
+            </div>
+            <div className="rounded-xl bg-[#f8f3ea] p-4">
+              <p className="text-2xl font-semibold text-[#7b5b26]">{formatCurrency(outstandingAmount)}</p>
+              <p className="text-sm text-gray-600">Unpaid amount</p>
+            </div>
+            <div className="rounded-xl bg-[#f1f6ff] p-4">
+              <p className="text-2xl font-semibold text-[#355c98]">{paidExpenseCount}</p>
+              <p className="text-sm text-gray-600">Paid expenses</p>
+            </div>
           </div>
-          <div className="rounded-xl bg-[#fff5f5] p-4">
-            <p className="text-2xl font-semibold text-[#b03f3f]">{overdueTasks.length}</p>
-            <p className="text-sm text-gray-600">Overdue tasks</p>
+        ) : null}
+
+        {section === "tasks" ? (
+          <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-[#f5f7f6] p-4">
+              <p className="text-2xl font-semibold text-[#2D4D3A]">{tasks.length}</p>
+              <p className="text-sm text-gray-600">Tracked tasks</p>
+            </div>
+            <div className="rounded-xl bg-[#f1f6ff] p-4">
+              <p className="text-2xl font-semibold text-[#355c98]">{openTaskCount}</p>
+              <p className="text-sm text-gray-600">Open tasks</p>
+            </div>
+            <div className="rounded-xl bg-[#fff5f5] p-4">
+              <p className="text-2xl font-semibold text-[#b03f3f]">{overdueTasks.length}</p>
+              <p className="text-sm text-gray-600">Overdue tasks</p>
+            </div>
           </div>
-          <div className="rounded-xl bg-[#f1f6ff] p-4">
-            <p className="text-2xl font-semibold text-[#355c98]">{vendorsAwaitingPayment.length}</p>
-            <p className="text-sm text-gray-600">Vendors not fully paid</p>
-          </div>
-        </div>
+        ) : null}
       </div>
 
       {error && (
@@ -877,38 +1035,123 @@ export default function PlanningDashboard({ section }: { section: Section }) {
               {!loading && expenses.length === 0 ? <p className="text-sm text-gray-500">No expenses yet.</p> : null}
               {expenses.map((expense) => (
                 <div key={expense.id} className="rounded-xl border border-gray-100 bg-[#fafbfa] p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-[#2D4D3A]">{expense.title}</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        {formatLabel(expense.category)}
-                        {expense.vendor ? ` · ${expense.vendor.name}` : ""}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600">
-                        <span>{formatCurrency(expense.amount)}</span>
-                        <span>Due: {formatDate(expense.dueDate)}</span>
-                        <span>Paid: {formatDate(expense.paidDate)}</span>
+                  {editingExpenseId === expense.id ? (
+                    <div className="space-y-3">
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <input
+                          value={expenseEditForm.title}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, title: event.target.value })}
+                          placeholder="Expense title"
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <select
+                          value={expenseEditForm.category}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, category: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {expenseCategories.map((category) => (
+                            <option key={category} value={category}>{formatLabel(category)}</option>
+                          ))}
+                        </select>
                       </div>
-                      {expense.note ? <p className="mt-2 text-sm text-gray-500">{expense.note}</p> : null}
-                    </div>
-                    <div className="flex items-center gap-2">
+                      <div className="grid gap-3 md:grid-cols-4">
+                        <input
+                          value={expenseEditForm.amount}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, amount: event.target.value })}
+                          placeholder="Amount"
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <select
+                          value={expenseEditForm.status}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, status: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {paymentStatuses.map((status) => (
+                            <option key={status} value={status}>{formatLabel(status)}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="date"
+                          value={expenseEditForm.dueDate}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, dueDate: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <input
+                          type="date"
+                          value={expenseEditForm.paidDate}
+                          onChange={(event) => setExpenseEditForm({ ...expenseEditForm, paidDate: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                      </div>
                       <select
-                        value={expense.status}
-                        onChange={(event) => updateExpenseStatus(expense.id, event.target.value)}
-                        className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                        value={expenseEditForm.vendorId}
+                        onChange={(event) => setExpenseEditForm({ ...expenseEditForm, vendorId: event.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                       >
-                        {paymentStatuses.map((status) => (
-                          <option key={status} value={status}>{formatLabel(status)}</option>
+                        <option value="">No linked vendor</option>
+                        {vendors.map((vendor) => (
+                          <option key={vendor.id} value={vendor.id}>{vendor.name}</option>
                         ))}
                       </select>
-                      <button
-                        onClick={() => deleteResource(`/api/admin/expenses/${expense.id}`, expense.title)}
-                        className="text-sm text-red-600 transition hover:text-red-800"
-                      >
-                        Delete
-                      </button>
+                      <textarea
+                        value={expenseEditForm.note}
+                        onChange={(event) => setExpenseEditForm({ ...expenseEditForm, note: event.target.value })}
+                        placeholder="Payment note"
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => saveExpenseEdit(expense.id)}
+                          className="rounded-md bg-[#2D4D3A] px-3 py-2 text-sm text-white hover:bg-[#1f3528]"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={cancelEditingExpense}
+                          className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-[#2D4D3A]">{expense.title}</p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          {formatLabel(expense.category)}
+                          {expense.vendor ? ` · ${expense.vendor.name}` : ""}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600">
+                          <span>{formatCurrency(expense.amount)}</span>
+                          <span>Due: {formatDate(expense.dueDate)}</span>
+                          <span>Paid: {formatDate(expense.paidDate)}</span>
+                        </div>
+                        {expense.note ? <p className="mt-2 text-sm text-gray-500">{expense.note}</p> : null}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => startEditingExpense(expense)}
+                          className="text-sm text-blue-600 transition hover:text-blue-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => updateExpenseStatus(expense.id, expense.status === "PAID" ? "PENDING" : "PAID")}
+                          className="rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {expense.status === "PAID" ? "Mark unpaid" : "Mark paid"}
+                        </button>
+                        <button
+                          onClick={() => deleteResource(`/api/admin/expenses/${expense.id}`, expense.title)}
+                          className="text-sm text-red-600 transition hover:text-red-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -926,35 +1169,116 @@ export default function PlanningDashboard({ section }: { section: Section }) {
               {!loading && tasks.length === 0 ? <p className="text-sm text-gray-500">No tasks yet.</p> : null}
               {tasks.map((task) => (
                 <div key={task.id} className="rounded-xl border border-gray-100 bg-[#fafbfa] p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium text-[#2D4D3A]">{task.title}</p>
-                      <p className="mt-1 text-sm text-gray-600">
-                        {formatLabel(task.owner)}
-                        {task.vendor ? ` · ${task.vendor.name}` : ""}
-                        {task.party ? ` · ${task.party.name}` : ""}
-                      </p>
-                      <p className="mt-2 text-sm text-gray-500">Due: {formatDate(task.dueDate)}</p>
-                      {task.details ? <p className="mt-2 text-sm text-gray-500">{task.details}</p> : null}
-                    </div>
-                    <div className="flex items-center gap-2">
+                  {editingTaskId === task.id ? (
+                    <div className="space-y-3">
+                      <input
+                        value={taskEditForm.title}
+                        onChange={(event) => setTaskEditForm({ ...taskEditForm, title: event.target.value })}
+                        placeholder="Task title"
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <textarea
+                        value={taskEditForm.details}
+                        onChange={(event) => setTaskEditForm({ ...taskEditForm, details: event.target.value })}
+                        placeholder="Details"
+                        rows={3}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <div className="grid gap-3 md:grid-cols-4">
+                        <select
+                          value={taskEditForm.status}
+                          onChange={(event) => setTaskEditForm({ ...taskEditForm, status: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {taskStatuses.map((status) => (
+                            <option key={status} value={status}>{formatLabel(status)}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={taskEditForm.owner}
+                          onChange={(event) => setTaskEditForm({ ...taskEditForm, owner: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          {taskOwners.map((owner) => (
+                            <option key={owner} value={owner}>{formatLabel(owner)}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="date"
+                          value={taskEditForm.dueDate}
+                          onChange={(event) => setTaskEditForm({ ...taskEditForm, dueDate: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        />
+                        <select
+                          value={taskEditForm.vendorId}
+                          onChange={(event) => setTaskEditForm({ ...taskEditForm, vendorId: event.target.value })}
+                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                        >
+                          <option value="">No linked vendor</option>
+                          {vendors.map((vendor) => (
+                            <option key={vendor.id} value={vendor.id}>{vendor.name}</option>
+                          ))}
+                        </select>
+                      </div>
                       <select
-                        value={task.status}
-                        onChange={(event) => updateTaskStatus(task.id, event.target.value)}
-                        className="rounded-md border border-gray-300 px-2 py-1 text-sm"
+                        value={taskEditForm.partyId}
+                        onChange={(event) => setTaskEditForm({ ...taskEditForm, partyId: event.target.value })}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                       >
-                        {taskStatuses.map((status) => (
-                          <option key={status} value={status}>{formatLabel(status)}</option>
+                        <option value="">No linked party</option>
+                        {partyOptions.map((party) => (
+                          <option key={party.id} value={party.id}>{party.name}</option>
                         ))}
                       </select>
-                      <button
-                        onClick={() => deleteResource(`/api/admin/tasks/${task.id}`, task.title)}
-                        className="text-sm text-red-600 transition hover:text-red-800"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => saveTaskEdit(task.id)}
+                          className="rounded-md bg-[#2D4D3A] px-3 py-2 text-sm text-white hover:bg-[#1f3528]"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={cancelEditingTask}
+                          className="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-[#2D4D3A]">{task.title}</p>
+                        <p className="mt-1 text-sm text-gray-600">
+                          {formatLabel(task.owner)}
+                          {task.vendor ? ` · ${task.vendor.name}` : ""}
+                          {task.party ? ` · ${task.party.name}` : ""}
+                        </p>
+                        <p className="mt-2 text-sm text-gray-500">Due: {formatDate(task.dueDate)}</p>
+                        {task.details ? <p className="mt-2 text-sm text-gray-500">{task.details}</p> : null}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => startEditingTask(task)}
+                          className="text-sm text-blue-600 transition hover:text-blue-800"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => updateTaskStatus(task.id, task.status === "DONE" ? "TODO" : "DONE")}
+                          className="rounded-md border border-gray-300 px-2 py-1 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {task.status === "DONE" ? "Reopen" : "Mark done"}
+                        </button>
+                        <button
+                          onClick={() => deleteResource(`/api/admin/tasks/${task.id}`, task.title)}
+                          className="text-sm text-red-600 transition hover:text-red-800"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

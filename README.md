@@ -49,3 +49,28 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 # TOdo
 i think i need to create parties together with a common name, and individual names
 a party will have multiple guests. each guest has a 1:1 relationship with RSVP
+
+## Planning Data Import (Local or Deployed DB)
+
+Use the import script to load vendors, expenses, and tasks into any environment where `DATABASE_URL` points at the right database.
+
+1. Copy and edit [data/planning-import.example.json](data/planning-import.example.json).
+2. Run:
+
+```bash
+npm run planning:import -- --file data/planning-import.example.json
+```
+
+Useful options:
+
+```bash
+# Clear existing planning data first (vendors, expenses, tasks)
+npm run planning:import -- --file data/planning-import.example.json --clear
+
+# Attempt to link existing unlinked expenses to vendors by matching text
+npm run planning:import -- --file data/planning-import.example.json --link-existing-expenses
+```
+
+Notes:
+- Expenses and tasks can link vendors using either `vendorId` or `vendorName` in the JSON input.
+- Tasks can link parties by `partySlug`.

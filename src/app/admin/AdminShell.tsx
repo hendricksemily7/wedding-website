@@ -11,7 +11,7 @@ const playfair = Playfair_Display({
 });
 
 const adminLinks = [
-  { href: "/admin/guests", label: "Guest Tracking" },
+  { href: "/admin/guests", label: "Guests" },
   { href: "/admin/vendors", label: "Vendors" },
   { href: "/admin/expenses", label: "Expenses" },
   { href: "/admin/tasks", label: "Tasks" },
@@ -111,16 +111,16 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
+    <div className="w-full max-w-7xl mx-auto overflow-x-hidden p-4 md:p-6">
       <div className="mb-6 rounded-3xl border border-[#d2dad5] bg-white/95 p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-[#6a7f72]">Wedding Admin</p>
             <h1 className={`${playfair.className} mt-2 text-3xl font-medium text-[#2D4D3A]`}>
-              Planning workspace
+              Admin workspace
             </h1>
             <p className="mt-1 text-sm text-gray-600">
-              Separate routes for guests, vendors, expenses, and tasks with one shared PIN session.
+              Choose a section. Each page keeps its own controls and data context.
             </p>
           </div>
           <button

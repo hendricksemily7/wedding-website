@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "planning:import": "node scripts/import-planning.mjs"
   },
   "dependencies": {
     "@fontsource/caveat": "^5.2.8",

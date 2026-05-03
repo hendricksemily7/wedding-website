@@ -10,7 +10,9 @@
 3. Shared PIN gate lives in `src/app/admin/AdminShell.tsx` and `src/app/admin/layout.tsx`.
 4. Planning models/API implemented for Vendor, Expense, Task.
 5. Vendor cards are editable inline on vendors page.
-6. Seed data imported:
+6. Expenses and tasks now support full inline edit (not only status).
+7. Planning import script added for deployed environments (`npm run planning:import`).
+8. Seed data imported:
 	- Vendors: 11 rows
 	- Expenses: 28 rows
 
@@ -28,15 +30,13 @@
 - `prisma/schema.prisma`
 
 ### Next Slice (Recommended)
-1. Navigation clarity pass:
-	- Reduce cross-section noise when in one planning section.
-	- Keep top-level admin nav minimal; show section-local controls only.
-2. Inline edit parity:
-	- Add full inline edit to expenses and tasks (not only status changes).
-3. Data integrity polish:
+1. Data integrity polish:
 	- Link seeded expenses to matching vendors (`vendorId`).
-4. Optional import/export:
+2. Optional import/export:
 	- CSV export for vendors/expenses/tasks.
+3. Import data operations:
+	- Create a production JSON payload based on `data/planning-import.example.json`.
+	- Run `npm run planning:import -- --file <payload> --link-existing-expenses`.
 
 ### Resume Prompt For New Session
 Use this exact prompt in a fresh chat:

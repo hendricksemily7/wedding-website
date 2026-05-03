@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { Playfair_Display } from "next/font/google";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { trackRSVPEvent } from "@/lib/rsvpAnalytics";
 
 const playfair = Playfair_Display({
   weight: "400",
@@ -13,6 +14,10 @@ const playfair = Playfair_Display({
 export default function Page() {
   const [name, setName] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    void trackRSVPEvent({ eventType: "lookup_view" });
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +29,11 @@ export default function Page() {
       .replace(/[^a-z0-9\s-]/g, '') // remove special characters like &
       .replace(/\s+/g, '-')          // replace spaces with hyphens
       .replace(/-+/g, '-');          // remove consecutive hyphens
+    void trackRSVPEvent({
+      eventType: "lookup_submit",
+      guestSlug: slug,
+      metadata: { queryLength: name.trim().length },
+    });
     router.push(`/rsvp/${slug}`);
   };
 

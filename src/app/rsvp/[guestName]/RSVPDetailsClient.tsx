@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Playfair_Display } from "next/font/google";
 import { meals } from "./meal/page";
+import { trackRSVPEvent } from "@/lib/rsvpAnalytics";
 
 function getFriendlyMealName(mealId: string) {
   const meal = meals.find((meal) => meal.id === mealId);
@@ -74,11 +75,25 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
             if (data.suggestions && data.suggestions.length > 0) {
               setSuggestions(data.suggestions);
               setError("We couldn't find an exact match. Did you mean one of these?");
+              void trackRSVPEvent({
+                eventType: "lookup_not_found_with_suggestions",
+                guestSlug: guestName,
+                metadata: { suggestionCount: data.suggestions.length },
+              });
             } else {
               setError("Sorry, the name you entered was not found. Please check your invitation and try again.");
+              void trackRSVPEvent({
+                eventType: "lookup_not_found",
+                guestSlug: guestName,
+              });
             }
           } else {
             setError("Failed to load reservation");
+            void trackRSVPEvent({
+              eventType: "details_load_failed",
+              guestSlug: guestName,
+              metadata: { status: res.status },
+            });
           }
           return;
         }
@@ -94,7 +109,29 @@ export default function RSVPDetailsClient({ guestName }: RSVPDetailsClientProps)
     fetchParty();
   }, [guestName]);
 
+  useEffect(() => {
+    if (!party) {
+      return;
+    }
+
+    void trackRSVPEvent({
+      eventType: "details_view",
+      guestSlug: guestName,
+      partyId: party.id,
+      totalGuests: party.guests.length,
+      metadata: {
+        hasExistingResponses: party.guests.some((guest) => Boolean(guest.rsvp)),
+      },
+    });
+  }, [party, guestName]);
+
   const handleStartRSVP = () => {
+    void trackRSVPEvent({
+      eventType: "respond_cta_clicked",
+      guestSlug: guestName,
+      partyId: party?.id,
+      totalGuests: party?.guests.length,
+    });
     router.push(`/rsvp/${guestName}/respond`);
   };
 

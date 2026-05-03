@@ -47,6 +47,29 @@ model RSVP {
   updatedAt                DateTime    @updatedAt
 }
 
+model RSVPFlowEvent {
+  id           String   @id @default(cuid())
+  flowSessionId String
+  guestSlug    String?
+  partyId      String?
+  eventType    String
+  step         String?
+  deviceType   String
+  viewportWidth Int?
+  pathname     String?
+  guestIndex   Int?
+  totalGuests  Int?
+  metadata     Json?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([deviceType, createdAt])
+  @@index([eventType, createdAt])
+  @@index([step, createdAt])
+  @@index([flowSessionId, createdAt])
+}
+
 model Vendor {
   id               String         @id @default(cuid())
   name             String

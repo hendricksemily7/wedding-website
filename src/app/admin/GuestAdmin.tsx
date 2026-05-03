@@ -27,6 +27,23 @@ interface Party {
   createdAt: string;
 }
 
+interface AnalyticsFunnelRow {
+  deviceType: "mobile" | "web";
+  step: string | null;
+  count: number;
+}
+
+interface AnalyticsKeyEventRow {
+  deviceType: "mobile" | "web";
+  eventType: string;
+  count: number;
+}
+
+interface AnalyticsSummary {
+  funnel: AnalyticsFunnelRow[];
+  keyEvents: AnalyticsKeyEventRow[];
+}
+
 type FilterType = "all" | "weddingParty" | "responded" | "attending" | "notAttending" | "needsShuttle" | "noResponse";
 
 export default function GuestAdmin() {
@@ -52,6 +69,10 @@ export default function GuestAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+  const [analytics, setAnalytics] = useState<AnalyticsSummary>({ funnel: [], keyEvents: [] });
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [analyticsExpanded, setAnalyticsExpanded] = useState(true);
 
   const fetchParties = async () => {
     try {
@@ -70,6 +91,38 @@ export default function GuestAdmin() {
 
   useEffect(() => {
     fetchParties();
+  }, []);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch("/api/rsvp/analytics");
+        if (!response.ok) {
+          throw new Error("Failed to fetch RSVP analytics");
+        }
+
+        const data = await response.json();
+        setAnalytics({
+          funnel: data.funnel ?? [],
+          keyEvents: data.keyEvents ?? [],
+        });
+      } catch {
+        setAnalyticsError("Unable to load RSVP flow analytics right now.");
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    setAnalyticsExpanded(!isMobile);
   }, []);
 
   const handleAddParty = async (event: React.FormEvent) => {
@@ -188,21 +241,6 @@ export default function GuestAdmin() {
       await fetchParties();
     } catch {
       alert("Failed to delete guest");
-    }
-  };
-
-  const handleDeleteAllParties = async () => {
-    if (!confirm(`Are you sure you want to delete ALL ${totalParties} parties and ${totalGuests} guests? This cannot be undone.`)) {
-      return;
-    }
-
-    try {
-      for (const party of parties) {
-        await fetch(`/api/admin/guests/${party.id}`, { method: "DELETE" });
-      }
-      await fetchParties();
-    } catch {
-      alert("Failed to delete all parties");
     }
   };
 
@@ -345,6 +383,23 @@ export default function GuestAdmin() {
     }))
     .filter((party) => party.guests.length > 0 || (!searchQuery.trim() && activeFilter === "all"));
 
+  const getKeyEventCount = (deviceType: "mobile" | "web", eventType: string) => {
+    const row = analytics.keyEvents.find((item) => item.deviceType === deviceType && item.eventType === eventType);
+    return row?.count ?? 0;
+  };
+
+  const getFunnelStepCount = (deviceType: "mobile" | "web", step: string) => {
+    const row = analytics.funnel.find((item) => item.deviceType === deviceType && item.step === step);
+    return row?.count ?? 0;
+  };
+
+  const flowOpenMobile = getKeyEventCount("mobile", "respond_flow_opened");
+  const flowOpenWeb = getKeyEventCount("web", "respond_flow_opened");
+  const submitSuccessMobile = getKeyEventCount("mobile", "submit_success");
+  const submitSuccessWeb = getKeyEventCount("web", "submit_success");
+  const mobileDropOff = Math.max(flowOpenMobile - submitSuccessMobile, 0);
+  const webDropOff = Math.max(flowOpenWeb - submitSuccessWeb, 0);
+
   if (loading) {
     return (
       <div className="rounded-2xl bg-white p-8 text-center text-gray-500 shadow-sm">
@@ -402,6 +457,85 @@ export default function GuestAdmin() {
           <p className="text-2xl font-bold text-blue-700">{needsShuttleGuests}</p>
           <p className="text-sm text-gray-600">Need Shuttle</p>
         </button>
+      </div>
+
+      <div className="rounded-2xl border border-[#d6ddd8] bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-lg font-semibold text-[#2D4D3A]">RSVP Flow Analytics</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#6a7f72]">Mobile vs Web</span>
+            <button
+              onClick={() => setAnalyticsExpanded((value) => !value)}
+              className="rounded-md border border-[#d5ddd8] px-3 py-1 text-xs font-medium text-[#2D4D3A] transition hover:bg-[#f5f7f6]"
+              aria-expanded={analyticsExpanded}
+            >
+              {analyticsExpanded ? "Collapse" : "Expand"}
+            </button>
+          </div>
+        </div>
+
+        {analyticsExpanded ? (
+          <>
+            <p className="mb-4 text-sm text-gray-600">
+              These numbers use tracked RSVP flow sessions only. Existing RSVP records from before tracking are excluded.
+            </p>
+
+            {analyticsLoading ? <p className="text-sm text-gray-500">Loading RSVP flow analytics...</p> : null}
+            {analyticsError ? <p className="text-sm text-red-600">{analyticsError}</p> : null}
+
+            {!analyticsLoading && !analyticsError ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-gray-200 bg-[#f8faf9] p-4">
+                  <p className="text-sm font-semibold text-[#2D4D3A]">Mobile</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xl font-semibold text-[#2D4D3A]">{flowOpenMobile}</p>
+                      <p className="text-xs text-gray-600">Started</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-semibold text-[#2D4D3A]">{submitSuccessMobile}</p>
+                      <p className="text-xs text-gray-600">Submitted</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-semibold text-red-700">{mobileDropOff}</p>
+                      <p className="text-xs text-gray-600">Drop-off</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-1 text-sm text-gray-700">
+                    <p>Attending step views: {getFunnelStepCount("mobile", "attending")}</p>
+                    <p>Meal step views: {getFunnelStepCount("mobile", "meal")}</p>
+                    <p>Shuttle step views: {getFunnelStepCount("mobile", "shuttle")}</p>
+                    <p>Review step views: {getFunnelStepCount("mobile", "review")}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-gray-200 bg-[#f8faf9] p-4">
+                  <p className="text-sm font-semibold text-[#2D4D3A]">Web</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xl font-semibold text-[#2D4D3A]">{flowOpenWeb}</p>
+                      <p className="text-xs text-gray-600">Started</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-semibold text-[#2D4D3A]">{submitSuccessWeb}</p>
+                      <p className="text-xs text-gray-600">Submitted</p>
+                    </div>
+                    <div>
+                      <p className="text-xl font-semibold text-red-700">{webDropOff}</p>
+                      <p className="text-xs text-gray-600">Drop-off</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-1 text-sm text-gray-700">
+                    <p>Attending step views: {getFunnelStepCount("web", "attending")}</p>
+                    <p>Meal step views: {getFunnelStepCount("web", "meal")}</p>
+                    <p>Shuttle step views: {getFunnelStepCount("web", "shuttle")}</p>
+                    <p>Review step views: {getFunnelStepCount("web", "review")}</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </>
+        ) : null}
       </div>
 
       {error ? <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
@@ -513,9 +647,6 @@ export default function GuestAdmin() {
                 className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 focus:outline-none focus:border-[#2D4D3A]"
               />
             </div>
-            <button onClick={handleDeleteAllParties} className="rounded border border-red-300 px-3 py-1 text-sm text-red-600 transition hover:bg-red-50 hover:text-red-800">
-              Delete All ({totalGuests} guests)
-            </button>
           </div>
         ) : null}
 
@@ -563,7 +694,8 @@ export default function GuestAdmin() {
               </div>
             ) : null}
 
-            <table className="w-full text-left">
+            <div className="max-w-full overflow-x-auto">
+              <table className="w-full min-w-[780px] text-left">
               <thead className="bg-gray-50 text-sm">
                 <tr>
                   <th className="px-4 py-2 font-medium text-gray-600">Guest Name</th>
@@ -668,7 +800,8 @@ export default function GuestAdmin() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         ))}
 

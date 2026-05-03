@@ -1,0 +1,39 @@
+{
+  "vendors": [
+    {
+      "name": "Blue Hill Farm",
+      "category": "VENUE",
+      "contactName": "Alex",
+      "email": "alex@example.com",
+      "phone": "555-111-2222",
+      "contractedAmount": 12500,
+      "paymentStatus": "SCHEDULED",
+      "dueDate": "2026-06-15",
+      "driveUrl": "https://drive.google.com/example",
+      "deliverables": "Ceremony + reception site",
+      "notes": "Final walkthrough in May"
+    }
+  ],
+  "expenses": [
+    {
+      "title": "Venue final payment",
+      "category": "VENUE",
+      "amount": 5000,
+      "status": "PENDING",
+      "dueDate": "2026-06-15",
+      "vendorName": "Blue Hill Farm",
+      "note": "Final installment"
+    }
+  ],
+  "tasks": [
+    {
+      "title": "Confirm venue timeline",
+      "details": "Review setup and teardown timing",
+      "status": "TODO",
+      "dueDate": "2026-05-20",
+      "owner": "BOTH",
+      "vendorName": "Blue Hill Farm",
+      "partySlug": "the-smith-family"
+    }
+  ]
+}
