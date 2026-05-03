@@ -111,34 +111,34 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto overflow-x-hidden p-4 md:p-6">
-      <div className="mb-6 rounded-3xl border border-[#d2dad5] bg-white/95 p-5 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="w-full max-w-7xl mx-auto overflow-x-hidden p-3 sm:p-4 md:p-6">
+      <div className="mb-4 rounded-3xl border border-[#d2dad5] bg-white/95 p-4 shadow-sm sm:p-5 md:mb-6">
+        <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-[#6a7f72]">Wedding Admin</p>
-            <h1 className={`${playfair.className} mt-2 text-3xl font-medium text-[#2D4D3A]`}>
+            <h1 className={`${playfair.className} mt-1 text-2xl font-medium text-[#2D4D3A] sm:mt-2 sm:text-3xl`}>
               Admin workspace
             </h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-xs text-gray-600 sm:text-sm">
               Choose a section. Each page keeps its own controls and data context.
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className="rounded-md border border-[#d5ddd8] px-3 py-2 text-sm text-[#2D4D3A] transition hover:bg-[#f5f7f6]"
+            className="rounded-md border border-[#d5ddd8] px-3 py-2 text-xs text-[#2D4D3A] transition hover:bg-[#f5f7f6] sm:text-sm"
           >
             Lock admin
           </button>
         </div>
 
-        <nav className="mt-5 flex flex-wrap gap-2">
+        <nav className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:mt-5 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
           {adminLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-full px-4 py-2 text-sm transition ${
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs transition sm:px-4 sm:py-2 sm:text-sm ${
                   isActive
                     ? "bg-[#2D4D3A] text-white"
                     : "bg-[#eef2ef] text-[#355241] hover:bg-[#dfe8e2]"

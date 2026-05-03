@@ -428,7 +428,7 @@ export default function GuestAdmin() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-7">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         <button onClick={() => setActiveFilter("all")} className={`rounded-lg p-4 text-center transition ${activeFilter === "all" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}>
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalParties}</p>
           <p className="text-sm text-gray-600">Parties</p>
@@ -694,7 +694,92 @@ export default function GuestAdmin() {
               </div>
             ) : null}
 
-            <div className="max-w-full overflow-x-auto">
+            <div className="md:hidden divide-y divide-gray-100">
+              {party.guests.map((guest) => (
+                <div key={guest.id} className="space-y-3 px-4 py-4">
+                  {editingRsvpGuestId === guest.id ? (
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={editRsvpForm.name}
+                        onChange={(event) => setEditRsvpForm({ ...editRsvpForm, name: event.target.value })}
+                        className="w-full rounded border border-gray-300 px-3 py-2 text-sm font-medium"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
+                        <select
+                          value={editRsvpForm.attending ? "yes" : "no"}
+                          onChange={(event) => setEditRsvpForm({ ...editRsvpForm, attending: event.target.value === "yes" })}
+                          className="rounded border border-gray-300 px-2 py-2 text-sm"
+                        >
+                          <option value="yes">Attending</option>
+                          <option value="no">Not Attending</option>
+                        </select>
+                        {editRsvpForm.attending ? (
+                          <select
+                            value={editRsvpForm.mealChoice}
+                            onChange={(event) => setEditRsvpForm({ ...editRsvpForm, mealChoice: event.target.value })}
+                            className="rounded border border-gray-300 px-2 py-2 text-sm"
+                          >
+                            <option value="">Select meal</option>
+                            <option value="CHICKEN">Lemon Chicken</option>
+                            <option value="PASTA">Spinach Ravioli</option>
+                            <option value="SQUASH">Stuffed Acorn Squash</option>
+                          </select>
+                        ) : (
+                          <div className="rounded border border-gray-200 px-2 py-2 text-sm text-gray-400">Meal: -</div>
+                        )}
+                      </div>
+                      <label className="flex items-center gap-2 text-sm text-gray-700">
+                        <input
+                          type="checkbox"
+                          checked={editRsvpForm.needsShuttle}
+                          onChange={(event) => setEditRsvpForm({ ...editRsvpForm, needsShuttle: event.target.checked })}
+                          className="accent-[#2D4D3A]"
+                        />
+                        Needs shuttle
+                      </label>
+                      <input
+                        type="text"
+                        value={editRsvpForm.dietaryNotes}
+                        onChange={(event) => setEditRsvpForm({ ...editRsvpForm, dietaryNotes: event.target.value })}
+                        placeholder="Dietary notes"
+                        className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                      />
+                      <div className="flex gap-3">
+                        <button onClick={() => handleUpdateRsvp(guest.id, guest.name)} className="text-sm text-green-600 hover:text-green-800">Save</button>
+                        <button onClick={() => setEditingRsvpGuestId(null)} className="text-sm text-gray-600 hover:text-gray-800">Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="font-medium text-[#2D4D3A]">
+                          {guest.name}
+                          {guest.isWeddingParty ? <span className="ml-2 rounded bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-800">WP</span> : null}
+                        </div>
+                        {guest.rsvp ? (
+                          <span className={`rounded-full px-2 py-1 text-xs font-medium ${guest.rsvp.attending ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                            {guest.rsvp.attending ? "Attending" : "Not Attending"}
+                          </span>
+                        ) : <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">No Response</span>}
+                      </div>
+                      <div className="grid grid-cols-2 gap-y-1 text-sm text-gray-600">
+                        <span>Meal</span><span className="text-right">{getMealName(guest.rsvp?.mealChoice)}</span>
+                        <span>Shuttle</span><span className="text-right">{guest.rsvp?.needsShuttle ? "Yes" : "-"}</span>
+                        <span>Rehearsal</span><span className="text-right">{guest.isWeddingParty ? (guest.rsvp?.attendingRehearsalDinner ? "Yes" : guest.rsvp?.attendingRehearsalDinner === false ? "No" : "-") : "-"}</span>
+                        <span>Notes</span><span className="text-right truncate">{guest.rsvp?.dietaryNotes || guest.rsvp?.comments || "-"}</span>
+                      </div>
+                      <div className="flex gap-4">
+                        <button onClick={() => startEditingRsvp(guest)} className="text-sm text-gray-500 hover:text-gray-700">Edit</button>
+                        <button onClick={() => handleDeleteGuest(guest.id, guest.name)} className="text-sm text-red-500 hover:text-red-700">Remove</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden max-w-full overflow-x-auto md:block">
               <table className="w-full min-w-[780px] text-left">
               <thead className="bg-gray-50 text-sm">
                 <tr>

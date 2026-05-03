@@ -25,7 +25,7 @@ export default function RootLayout({
         - bg-[#d5dad47f]: soft custom background color
       */}
       <body
-        className="font-sans min-h-screen min-w-screen"
+        className="font-sans min-h-screen w-full overflow-x-hidden"
       >
       <div className="bg-[#95a6a0] w-full flex justify-center">
        {/* < Image src="/Notes_251129_133244-removebg-preview.png" alt="Wedding photo" width={900} height={700} className="max-w-xs md:max-w-md w-full md:rounded-lg h-auto mx-auto" /> */}

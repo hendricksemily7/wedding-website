@@ -28,9 +28,9 @@ const SharedHeader: React.FC<HeaderProps> = ({
   const menuLabel = navLinksDict[pathname] || "";
 
   return (
-    <header className="">
+    <header className="w-full overflow-x-hidden">
       {/* Top info section */}
-      <div className="flex flex-col items-center pb-4 px-4">
+      <div className="mx-auto flex w-full max-w-5xl min-w-0 flex-col items-center px-4 pb-4">
         <h1 className={`${playfair.className} text-3xl md:text-4xl text-center`}>
           {coupleNames}
         </h1>
@@ -47,13 +47,13 @@ const SharedHeader: React.FC<HeaderProps> = ({
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#95a6a0]">
+      <nav className="w-full overflow-x-hidden bg-[#95a6a0]">
         {/* Mobile toggle button */}
-        <div className={`${playfair.className} mx-auto flex w-full max-w-5xl justify-between items-center px-4 pt-4 pb-2 md:hidden text-base`}>
-          <span className="font-semibold text-md">
+        <div className={`${playfair.className} mx-auto flex w-full max-w-5xl min-w-0 items-center justify-between px-4 pt-4 pb-2 text-base md:hidden`}>
+          <span className="text-md min-w-0 truncate pr-2 font-semibold">
             {!isOpen ? menuLabel.toUpperCase() : ''}
           </span>
-          <button onClick={() => setIsOpen(!isOpen)} className="focus:outline-none">
+          <button onClick={() => setIsOpen(!isOpen)} className="shrink-0 focus:outline-none" aria-label="Toggle menu">
             {/* Simple hamburger */}
             <div className="space-y-1">
               <span className="block w-6 h-0.5 bg-gray-800"></span>
@@ -66,7 +66,7 @@ const SharedHeader: React.FC<HeaderProps> = ({
         {/* Links */}
         <ul
           className={`${playfair.className}
-            mx-auto w-full max-w-5xl text-lg
+            mx-auto w-full max-w-5xl overflow-x-hidden text-lg
             md:flex md:flex-row md:items-center md:justify-center md:gap-4 md:px-6 md:pt-6
             ${isOpen ? 'flex flex-col items-center gap-2 px-4 pb-4' : 'hidden'}
           `}
