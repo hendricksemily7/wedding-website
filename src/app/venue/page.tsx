@@ -15,14 +15,7 @@ export default function Page() {
     <div className="w-full max-w-5xl mx-auto px-6 text-center">
       {/* Title */}
       <h1 className={`${playfair.className} text-2xl md:text-3xl font-bold mb-6`}>
-        <Link
-          href="https://www.innatgracefarm.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
-          The Inn at Grace Farm
-        </Link>
+      The Inn at Grace Farm
       </h1>
 
       {/* Image */}
@@ -47,7 +40,7 @@ export default function Page() {
           <div className="flex justify-center items-center gap-2 mt-6 text-gray-700">
       {/* <BsBrowserChrome size={30} /> */}
        <FiGlobe size={20}  />
-          <Link href="https://www.innatgracefarm.com/" target="_blank" rel="noopener noreferrer" className="text-black-600 hover:underline">
+          <Link href="https://www.theinnatgracefarm.com/" target="_blank" rel="noopener noreferrer" className="text-black-600 hover:underline">
         <span className="text-gray-700">View the Venue's website</span>
           </Link>
       </div>
