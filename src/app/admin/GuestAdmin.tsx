@@ -348,6 +348,7 @@ export default function GuestAdmin() {
   const totalGuests = parties.reduce((sum, party) => sum + party.guests.length, 0);
   const weddingPartyGuests = parties.reduce((sum, party) => sum + party.guests.filter((guest) => guest.isWeddingParty).length, 0);
   const respondedGuests = parties.reduce((sum, party) => sum + party.guests.filter((guest) => guest.rsvp).length, 0);
+  const noResponseGuests = totalGuests - respondedGuests;
   const attendingGuests = parties.reduce((sum, party) => sum + party.guests.filter((guest) => guest.rsvp?.attending).length, 0);
   const notAttendingGuests = parties.reduce((sum, party) => sum + party.guests.filter((guest) => guest.rsvp && !guest.rsvp.attending).length, 0);
   const needsShuttleGuests = parties.reduce((sum, party) => sum + party.guests.filter((guest) => guest.rsvp?.needsShuttle).length, 0);
@@ -372,16 +373,45 @@ export default function GuestAdmin() {
   };
 
   const filteredParties = parties
-    .map((party) => ({
-      ...party,
-      guests: party.guests.filter((guest) => {
+    .map((party) => {
+      const guests = party.guests.filter((guest) => {
         const matchesSearch = !searchQuery.trim()
           || guest.name.toLowerCase().includes(searchQuery.toLowerCase())
           || party.name.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesSearch && applyFilter(guest);
-      }),
-    }))
-    .filter((party) => party.guests.length > 0 || (!searchQuery.trim() && activeFilter === "all"));
+      });
+
+      if (activeFilter === "responded") {
+        guests.sort((a, b) => {
+          const aTime = a.rsvp ? new Date(a.rsvp.respondedAt).getTime() : 0;
+          const bTime = b.rsvp ? new Date(b.rsvp.respondedAt).getTime() : 0;
+          return bTime - aTime;
+        });
+      }
+
+      return {
+        ...party,
+        guests,
+      };
+    })
+    .filter((party) => party.guests.length > 0 || (!searchQuery.trim() && activeFilter === "all"))
+    .sort((a, b) => {
+      if (activeFilter !== "responded") {
+        return 0;
+      }
+
+      const aLatestResponse = a.guests.reduce((latest, guest) => {
+        const respondedAt = guest.rsvp ? new Date(guest.rsvp.respondedAt).getTime() : 0;
+        return Math.max(latest, respondedAt);
+      }, 0);
+
+      const bLatestResponse = b.guests.reduce((latest, guest) => {
+        const respondedAt = guest.rsvp ? new Date(guest.rsvp.respondedAt).getTime() : 0;
+        return Math.max(latest, respondedAt);
+      }, 0);
+
+      return bLatestResponse - aLatestResponse;
+    });
 
   const getKeyEventCount = (deviceType: "mobile" | "web", eventType: string) => {
     const row = analytics.keyEvents.find((item) => item.deviceType === deviceType && item.eventType === eventType);
@@ -428,7 +458,7 @@ export default function GuestAdmin() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
         <button onClick={() => setActiveFilter("all")} className={`rounded-lg p-4 text-center transition ${activeFilter === "all" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}>
           <p className="text-2xl font-bold text-[#2D4D3A]">{totalParties}</p>
           <p className="text-sm text-gray-600">Parties</p>
@@ -444,6 +474,10 @@ export default function GuestAdmin() {
         <button onClick={() => setActiveFilter(activeFilter === "responded" ? "all" : "responded")} className={`rounded-lg p-4 text-center transition ${activeFilter === "responded" ? "ring-2 ring-[#2D4D3A] bg-[#e8ebe9]" : "bg-[#f5f7f6] hover:bg-[#e8ebe9]"}`}>
           <p className="text-2xl font-bold text-[#2D4D3A]">{respondedGuests}</p>
           <p className="text-sm text-gray-600">Responded</p>
+        </button>
+        <button onClick={() => setActiveFilter(activeFilter === "noResponse" ? "all" : "noResponse")} className={`rounded-lg p-4 text-center transition ${activeFilter === "noResponse" ? "ring-2 ring-gray-500 bg-gray-100" : "bg-gray-50 hover:bg-gray-100"}`}>
+          <p className="text-2xl font-bold text-gray-700">{noResponseGuests}</p>
+          <p className="text-sm text-gray-600">Not Responded</p>
         </button>
         <button onClick={() => setActiveFilter(activeFilter === "attending" ? "all" : "attending")} className={`rounded-lg p-4 text-center transition ${activeFilter === "attending" ? "ring-2 ring-green-500 bg-green-100" : "bg-green-50 hover:bg-green-100"}`}>
           <p className="text-2xl font-bold text-green-700">{attendingGuests}</p>
