@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { navLinksDict } from './utils';
+import { calculateDaysToGo, navLinksDict } from './utils';
 import { Playfair_Display } from 'next/font/google';
 
 const playfair = Playfair_Display({
@@ -13,19 +13,18 @@ const playfair = Playfair_Display({
 interface HeaderProps {
   coupleNames: string;
   eventDetails: string;
-  countdown: string;
   navLinksList: { label: string; href: string, target: string }[];
 }
 
 const SharedHeader: React.FC<HeaderProps> = ({
   coupleNames,
   eventDetails,
-  countdown,
   navLinksList,
 }) => {
   const pathname = usePathname() as string;
   const [isOpen, setIsOpen] = useState(false); // mobile menu toggle
   const menuLabel = navLinksDict[pathname] || "";
+  const countdown = calculateDaysToGo();
 
   return (
     <header className="w-full overflow-x-hidden">

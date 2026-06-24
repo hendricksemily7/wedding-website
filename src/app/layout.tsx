@@ -2,7 +2,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import SharedHeader from "./sharedHeader";
-import { calculateDaysToGo, weddingNavLinksList } from "./utils";
+import { weddingNavLinksList } from "./utils";
 import Image from "next/image";
 
 export const metadata: Metadata = {
@@ -40,7 +40,6 @@ export default function RootLayout({
           <SharedHeader
             coupleNames="EMILY & JESS"
             eventDetails="SEPTEMBER 26, 2026 • FAIRFAX, VT"
-            countdown={calculateDaysToGo()}
             navLinksList={weddingNavLinksList}
           />
         </div>
